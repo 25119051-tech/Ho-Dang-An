@@ -2,45 +2,76 @@
 <html lang="vi">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dành Riêng Cho Trương Gia Mỹ 💖</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Dành Riêng Cho Trương Gia Mỹ 💖 | Ultimate 3D Love Experience</title>
     <style>
+        /* ==========================================
+           1. DESIGN SYSTEM & CSS VARIABLES
+           ========================================== */
+        :root {
+            --bg-primary: #050106;
+            --bg-secondary: #0f040b;
+            --accent-pink: #ff4d6d;
+            --accent-rose: #ff88a5;
+            --accent-deep: #c9184a;
+            --accent-light: #ffccd5;
+            --accent-cyan: #4cc9f0;
+            --accent-purple: #7209b7;
+            --text-main: #fff0f3;
+            --text-muted: rgba(255, 204, 213, 0.6);
+            --glass-bg: rgba(15, 4, 11, 0.88);
+            --glass-border: rgba(255, 77, 109, 0.35);
+            --glass-shadow: 0 0 35px rgba(201, 24, 74, 0.3);
+            --font-stack: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            --transition-fast: 0.2s ease;
+            --transition-normal: 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* ==========================================
+           2. GLOBAL RESET & BASE STYLES
+           ========================================== */
         * {
             margin: 0;
             padding: 0;
             box-sizing: border-box;
             user-select: none;
             -webkit-user-select: none;
+            -webkit-tap-highlight-color: transparent;
         }
 
-        body {
-            background-color: #050106;
-            color: #fff0f3;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+        html, body {
+            width: 100%;
+            height: 100%;
             overflow: hidden;
-            width: 100vw;
-            height: 100vh;
+            background-color: var(--bg-primary);
+            color: var(--text-main);
+            font-family: var(--font-stack);
         }
 
-        /* Ambient Background Canvas */
-        #bgCanvas {
+        /* ==========================================
+           3. CANVAS LAYERS ARCHITECTURE
+           ========================================== */
+        .canvas-layer {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            display: block;
+        }
+
+        #bgCanvas {
             z-index: 1;
             pointer-events: none;
         }
 
-        /* Main 3D Canvas */
-        #heartCanvas {
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
+        #trailCanvas {
             z-index: 2;
+            pointer-events: none;
+        }
+
+        #heartCanvas {
+            z-index: 3;
             cursor: grab;
         }
 
@@ -48,230 +79,585 @@
             cursor: grabbing;
         }
 
-        /* Screen 1: Intro Question */
+        #equalizerCanvas {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 120px;
+            z-index: 4;
+            pointer-events: none;
+            opacity: 0.7;
+        }
+
+        /* ==========================================
+           4. INTRO SCREEN & QUESTION BOX
+           ========================================== */
         #intro-screen {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            z-index: 10;
+            z-index: 100;
             display: flex;
             justify-content: center;
             align-items: center;
-            background: rgba(5, 1, 6, 0.85);
-            backdrop-filter: blur(8px);
+            background: rgba(5, 1, 6, 0.92);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
             transition: opacity 0.8s ease, visibility 0.8s ease;
         }
 
-        .question-box {
+        .question-card {
             position: relative;
-            text-align: center;
-            padding: 40px 20px;
-            background: rgba(255, 255, 255, 0.03);
-            border: 1px solid rgba(255, 77, 109, 0.3);
-            border-radius: 20px;
-            box-shadow: 0 0 30px rgba(201, 24, 74, 0.2);
-            max-width: 90%;
-            width: 420px;
-            min-height: 260px;
+            width: 90%;
+            max-width: 480px;
+            min-height: 320px;
+            padding: 40px 30px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 28px;
+            box-shadow: var(--glass-shadow);
             display: flex;
             flex-direction: column;
             justify-content: space-between;
             align-items: center;
+            text-align: center;
+            overflow: hidden;
+            animation: cardFloat 4s ease-in-out infinite alternate;
         }
 
-        h1 {
-            font-size: 1.6rem;
-            color: #ffb3c1;
-            text-shadow: 0 0 12px #ff4d6d;
-            line-height: 1.4;
-            margin-bottom: 20px;
+        @keyframes cardFloat {
+            0% { transform: translateY(0px); }
+            100% { transform: translateY(-10px); }
         }
 
-        .btn-group {
+        .question-card h1 {
+            font-size: 1.65rem;
+            font-weight: 700;
+            color: var(--accent-rose);
+            text-shadow: 0 0 16px var(--accent-pink);
+            line-height: 1.45;
+            margin-bottom: 15px;
+        }
+
+        .teaser-text {
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            min-height: 24px;
+            transition: color 0.3s;
+        }
+
+        .btn-container {
             position: relative;
             width: 100%;
-            height: 120px;
+            height: 140px;
+            margin-top: 15px;
         }
 
-        .btn {
-            padding: 12px 28px;
-            font-size: 1rem;
+        .btn-action {
+            position: absolute;
+            padding: 14px 32px;
+            font-size: 1.05rem;
             font-weight: 600;
             color: #ffffff;
-            background: linear-gradient(135deg, #c9184a, #ff4d6d);
+            background: linear-gradient(135deg, var(--accent-deep), var(--accent-pink));
             border: none;
-            border-radius: 25px;
+            border-radius: 30px;
             cursor: pointer;
-            box-shadow: 0 0 15px rgba(255, 77, 109, 0.4);
-            transition: transform 0.2s ease, left 0.15s ease, top 0.15s ease;
-            position: absolute;
+            box-shadow: 0 0 20px rgba(255, 77, 109, 0.4);
+            transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275), left 0.2s ease, top 0.2s ease, box-shadow 0.2s;
+            outline: none;
         }
 
-        .btn:hover {
-            box-shadow: 0 0 25px rgba(255, 77, 109, 0.8);
+        .btn-action:hover {
+            box-shadow: 0 0 30px rgba(255, 77, 109, 0.8);
         }
 
         #btn-yes {
-            left: 10%;
-            top: 30px;
-            z-index: 2;
+            left: 12%;
+            top: 40px;
+            z-index: 10;
         }
 
         #btn-no {
-            left: 60%;
-            top: 30px;
-            background: linear-gradient(135deg, #3a0ca3, #4cc9f0);
-            box-shadow: 0 0 15px rgba(76, 201, 240, 0.4);
-            z-index: 1;
+            left: 56%;
+            top: 40px;
+            background: linear-gradient(135deg, var(--accent-purple), var(--accent-cyan));
+            box-shadow: 0 0 20px rgba(76, 201, 240, 0.4);
+            z-index: 5;
         }
 
-        /* HUD Navigation Overlay */
-        #hud {
+        /* ==========================================
+           5. HUD NAVIGATION & OVERLAYS
+           ========================================== */
+        #hud-navbar {
             position: absolute;
-            top: 20px;
-            right: 20px;
-            z-index: 5;
+            top: 24px;
+            right: 24px;
+            z-index: 50;
             display: none;
             gap: 12px;
+            flex-wrap: wrap;
+            justify-content: flex-end;
         }
 
-        .hud-btn {
-            position: relative;
-            padding: 10px 18px;
-            font-size: 0.85rem;
-            background: rgba(24, 10, 18, 0.7);
-            border: 1px solid rgba(255, 77, 109, 0.5);
-            backdrop-filter: blur(5px);
-            border-radius: 20px;
-            color: #ffccd5;
+        .hud-button {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 20px;
+            font-size: 0.88rem;
+            font-weight: 500;
+            color: var(--accent-light);
+            background: rgba(24, 10, 18, 0.8);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(8px);
+            -webkit-backdrop-filter: blur(8px);
+            border-radius: 25px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: var(--transition-normal);
         }
 
-        .hud-btn:hover {
-            background: rgba(201, 24, 74, 0.6);
-            color: #fff;
-            box-shadow: 0 0 15px #ff4d6d;
+        .hud-button:hover {
+            background: rgba(201, 24, 74, 0.85);
+            color: #ffffff;
+            box-shadow: 0 0 20px var(--accent-pink);
+            transform: translateY(-2px);
         }
 
-        /* Letter Modal */
-        #modal {
+        /* ==========================================
+           6. MODAL SYSTEM & TABBED SETTINGS
+           ========================================== */
+        .modal-wrapper {
             display: none;
             position: absolute;
             top: 50%;
             left: 50%;
             transform: translate(-50%, -50%);
-            z-index: 20;
-            width: 90%;
-            max-width: 450px;
-            background: rgba(15, 4, 11, 0.92);
-            border: 1px solid #ff4d6d;
-            border-radius: 16px;
-            padding: 25px;
-            box-shadow: 0 0 40px rgba(255, 77, 109, 0.4);
-            backdrop-filter: blur(10px);
+            z-index: 150;
+            width: 92%;
+            max-width: 520px;
+            background: var(--glass-bg);
+            border: 1px solid var(--glass-border);
+            border-radius: 24px;
+            padding: 30px;
+            box-shadow: 0 0 50px rgba(255, 77, 109, 0.5);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            animation: modalPop 0.35s cubic-bezier(0.175, 0.885, 0.32, 1.275);
         }
 
-        #modal h2 {
-            color: #ff88a5;
-            font-size: 1.2rem;
+        @keyframes modalPop {
+            0% { transform: translate(-50%, -45%) scale(0.9); opacity: 0; }
+            100% { transform: translate(-50%, -50%) scale(1); opacity: 1; }
+        }
+
+        .modal-title {
+            color: var(--accent-rose);
+            font-size: 1.35rem;
             text-align: center;
-            margin-bottom: 15px;
-            text-shadow: 0 0 8px #c9184a;
+            margin-bottom: 20px;
+            text-shadow: 0 0 12px var(--accent-deep);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
         }
 
-        #letter-body {
-            font-size: 0.95rem;
-            line-height: 1.6;
-            color: #fff0f3;
-            min-height: 140px;
-            white-space: pre-wrap;
-            border-top: 1px dashed rgba(255, 179, 193, 0.3);
-            padding-top: 15px;
+        /* Settings Tabs Navigation */
+        .tab-nav {
+            display: flex;
+            gap: 8px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 254, 254, 0.1);
+            padding-bottom: 10px;
         }
 
-        #close-modal {
-            margin: 20px auto 0 auto;
+        .tab-btn {
+            flex: 1;
+            padding: 8px 12px;
+            font-size: 0.82rem;
+            background: transparent;
+            border: none;
+            color: var(--text-muted);
+            cursor: pointer;
+            border-radius: 12px;
+            transition: var(--transition-fast);
+        }
+
+        .tab-btn.active {
+            background: rgba(255, 77, 109, 0.2);
+            color: var(--accent-rose);
+            font-weight: 600;
+            border: 1px solid rgba(255, 77, 109, 0.4);
+        }
+
+        .tab-content {
+            display: none;
+        }
+
+        .tab-content.active {
             display: block;
-            position: static;
         }
 
-        #hint-text {
-            position: absolute;
-            bottom: 20px;
+        /* Form Controls */
+        .control-group {
+            margin-bottom: 18px;
+        }
+
+        .control-label {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.88rem;
+            color: var(--accent-light);
+            margin-bottom: 8px;
+        }
+
+        .control-label .val-tag {
+            color: var(--accent-pink);
+            font-weight: 700;
+        }
+
+        input[type="range"] {
+            -webkit-appearance: none;
+            width: 100%;
+            height: 6px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 3px;
+            outline: none;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: var(--accent-pink);
+            cursor: pointer;
+            box-shadow: 0 0 12px var(--accent-pink);
+            transition: transform 0.1s;
+        }
+
+        input[type="range"]::-webkit-slider-thumb:hover {
+            transform: scale(1.2);
+        }
+
+        .select-custom {
+            width: 100%;
+            padding: 10px 14px;
+            background: rgba(0, 0, 0, 0.4);
+            border: 1px solid var(--glass-border);
+            border-radius: 12px;
+            color: var(--text-main);
+            font-family: inherit;
+            outline: none;
+        }
+
+        /* Letter Body */
+        #letter-text-container {
+            font-size: 0.96rem;
+            line-height: 1.7;
+            color: var(--text-main);
+            max-height: 260px;
+            overflow-y: auto;
+            white-space: pre-wrap;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-radius: 14px;
+            border: 1px dashed rgba(255, 120, 150, 0.3);
+        }
+
+        #letter-text-container::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        #letter-text-container::-webkit-scrollbar-thumb {
+            background: var(--accent-deep);
+            border-radius: 3px;
+        }
+
+        .btn-modal-close {
+            margin: 22px auto 0 auto;
+            display: block;
             width: 100%;
             text-align: center;
-            font-size: 0.8rem;
-            color: rgba(255, 204, 213, 0.5);
-            z-index: 3;
+        }
+
+        /* ==========================================
+           7. TOAST NOTIFICATIONS
+           ========================================== */
+        #toast-container {
+            position: absolute;
+            bottom: 70px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 200;
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
             pointer-events: none;
-            display: none;
+        }
+
+        .toast-item {
+            padding: 10px 22px;
+            background: rgba(201, 24, 74, 0.9);
+            color: #fff;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            box-shadow: 0 0 20px rgba(255, 77, 109, 0.6);
+            backdrop-filter: blur(6px);
+            animation: toastIn 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275), toastOut 0.3s 2.7s forwards;
+        }
+
+        @keyframes toastIn {
+            from { transform: translateY(20px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        @keyframes toastOut {
+            from { transform: translateY(0); opacity: 1; }
+            to { transform: translateY(-20px); opacity: 0; }
         }
     </style>
 </head>
 <body>
 
-    <canvas id="bgCanvas"></canvas>
-    <canvas id="heartCanvas"></canvas>
+    <!-- Canvas Engine Stack -->
+    <canvas id="bgCanvas" class="canvas-layer"></canvas>
+    <canvas id="trailCanvas" class="canvas-layer"></canvas>
+    <canvas id="heartCanvas" class="canvas-layer"></canvas>
+    <canvas id="equalizerCanvas"></canvas>
 
-    <!-- Screen 1 -->
+    <!-- Màn hình 1: Câu Hỏi Tương Tác -->
     <div id="intro-screen">
-        <div class="question-box" id="question-box">
-            <h1>Chị Trương Gia Mỹ đồng ý làm bạn em nha? 💕</h1>
-            <div class="btn-group" id="btn-container">
-                <button id="btn-yes" class="btn">Đồng ý 💖</button>
-                <button id="btn-no" class="btn">Không ❌</button>
+        <div class="question-card" id="question-card">
+            <h1 id="question-title">Chị Trương Gia Mỹ đồng ý làm bạn em nha? 💕</h1>
+            <div class="teaser-text" id="teaser-text">Hãy chọn câu trả lời thật lòng nha... ✨</div>
+            
+            <div class="btn-container" id="btn-container">
+                <button id="btn-yes" class="btn-action">Đồng ý 💖</button>
+                <button id="btn-no" class="btn-action">Không ❌</button>
             </div>
         </div>
     </div>
 
-    <!-- HUD -->
-    <div id="hud">
-        <button id="btn-music" class="hud-btn">Tắt Nhạc 🎵</button>
-        <button id="btn-letter" class="hud-btn">Xem Thư 💌</button>
-        <button id="btn-reset" class="hud-btn">Làm lại 🔄</button>
+    <!-- HUD Điều Khiển Màn Hình Chính -->
+    <div id="hud-navbar">
+        <button id="btn-settings" class="hud-button"><span>⚙️</span> Cài Đặt</button>
+        <button id="btn-music" class="hud-button"><span>🎵</span> Tắt Nhạc</button>
+        <button id="btn-letter" class="hud-button"><span>💌</span> Xem Thư</button>
+        <button id="btn-preset" class="hud-button"><span>🎨</span> Đổi Màu</button>
+        <button id="btn-reset" class="hud-button"><span>🔄</span> Làm Lại</button>
     </div>
 
-    <div id="hint-text">✨ Nhấp và kéo chuột/tay để xoay trái tim 3D ✨</div>
+    <!-- Toast Popup System -->
+    <div id="toast-container"></div>
 
-    <!-- Modal -->
-    <div id="modal">
-        <h2>💌 THƯ TÌNH DÀNH RIÊNG CHO MỸ 💌</h2>
-        <div id="letter-body"></div>
-        <button id="close-modal" class="btn hud-btn">Đóng thư 💕</button>
+    <!-- Modal 1: Cửa Sổ Thư Tình -->
+    <div id="modal-letter" class="modal-wrapper">
+        <h2 class="modal-title"><span>💌</span> BỨC THƯ TÌNH CỦA MỸ</h2>
+        <div id="letter-text-container"></div>
+        <button id="close-letter" class="hud-button btn-modal-close">Đóng Thư 💕</button>
     </div>
 
+    <!-- Modal 2: Cửa Sổ Cài Đặt Nâng Cao (Tabbed Interface) -->
+    <div id="modal-settings" class="modal-wrapper">
+        <h2 class="modal-title"><span>⚙️</span> CÀI ĐẶT TRÁI TIM 3D</h2>
+        
+        <div class="tab-nav">
+            <button class="tab-btn active" data-tab="tab-3d">Hình Khối 3D</button>
+            <button class="tab-btn" data-tab="tab-fx">Hiệu Ứng</button>
+            <button class="tab-btn" data-tab="tab-audio">Âm Nhạc</button>
+        </div>
+
+        <!-- Tab 1: 3D Engine Control -->
+        <div id="tab-3d" class="tab-content active">
+            <div class="control-group">
+                <div class="control-label">
+                    <span>Cỡ trái tim:</span>
+                    <span id="lbl-scale" class="val-tag">1.0x</span>
+                </div>
+                <input type="range" id="slider-scale" min="0.4" max="2.4" step="0.05" value="1.0">
+            </div>
+
+            <div class="control-group">
+                <div class="control-label">
+                    <span>Tốc độ xoay 3D:</span>
+                    <span id="lbl-rot" class="val-tag">1.0x</span>
+                </div>
+                <input type="range" id="slider-rot" min="0.0" max="3.5" step="0.1" value="1.0">
+            </div>
+
+            <div class="control-group">
+                <div class="control-label">
+                    <span>Tốc độ nhịp đập:</span>
+                    <span id="lbl-pulse" class="val-tag">1.0x</span>
+                </div>
+                <input type="range" id="slider-pulse" min="0.1" max="3.0" step="0.1" value="1.0">
+            </div>
+
+            <div class="control-group">
+                <div class="control-label">
+                    <span>Số lượng hạt 3D:</span>
+                    <span id="lbl-density" class="val-tag">4500 hạt</span>
+                </div>
+                <input type="range" id="slider-density" min="1500" max="7500" step="500" value="4500">
+            </div>
+        </div>
+
+        <!-- Tab 2: Visual Effects -->
+        <div id="tab-fx" class="tab-content">
+            <div class="control-group">
+                <div class="control-label">
+                    <span>Kiểu hạt nền:</span>
+                </div>
+                <select id="select-bg-mode" class="select-custom">
+                    <option value="stars">Ngôi sao lấp lánh 🌟</option>
+                    <option value="hearts">Trái tim nhỏ bay 💖</option>
+                </select>
+            </div>
+
+            <div class="control-group" style="margin-top: 15px;">
+                <div class="control-label">
+                    <span>Hiệu ứng vệt chuột (Glow Trail):</span>
+                    <span id="lbl-trail" class="val-tag">Bật</span>
+                </div>
+                <input type="range" id="slider-trail" min="0" max="1" step="1" value="1">
+            </div>
+        </div>
+
+        <!-- Tab 3: Audio & Beats -->
+        <div id="tab-audio" class="tab-content">
+            <div class="control-group">
+                <div class="control-label">
+                    <span>Đập theo nhịp nhạc (Beat React):</span>
+                    <span id="lbl-beat" class="val-tag">Bật</span>
+                </div>
+                <input type="range" id="slider-beat" min="0" max="1" step="1" value="1">
+            </div>
+
+            <div class="control-group" style="margin-top: 15px;">
+                <div class="control-label">
+                    <span>Âm lượng nhạc nền:</span>
+                    <span id="lbl-vol" class="val-tag">80%</span>
+                </div>
+                <input type="range" id="slider-vol" min="0" max="1" step="0.05" value="0.8">
+            </div>
+        </div>
+
+        <button id="close-settings" class="hud-button btn-modal-close">Lưu & Đóng ✨</button>
+    </div>
+
+    <!-- Background Music Element -->
     <audio id="bgm" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=sweet-love-111578.mp3"></audio>
 
 <script>
+    /* ==========================================================================
+       8. GLOBAL STATE & CONFIGURATION MATRIX
+       ========================================================================== */
     const TARGET_NAME = "Trương Gia Mỹ";
-    const letterTextContent = `Gửi chị ${TARGET_NAME},\n\nEm tạo chiếc app nhỏ này chỉ dành riêng cho chị thôi!\nCảm ơn chị vì đã luôn xuất hiện thật rạng rỡ và đem lại nhiều niềm vui.\n\nChúc chị luôn xinh đẹp, hạnh phúc và có những ngày thật ngọt ngào nha!\n\nFrom your secret admirer with 💖`;
+    
+    const letterTextContent = `Gửi chị ${TARGET_NAME},\n\nEm tạo chiếc app nhỏ này chỉ dành riêng cho chị thôi!\nCảm ơn chị vì đã luôn xuất hiện thật rạng rỡ và đem lại nhiều niềm vui cho mọi người xung quanh.\n\nChúc chị luôn xinh đẹp, hạnh phúc, đạt được mọi ước mơ và có những ngày tháng thật ngọt ngào nha!\n\nFrom your secret admirer with 💖`;
 
+    const teaseMessages = [
+        "Ơ chị định bấm 'Không' thiệt hả? 🥺",
+        "Nút 'Không' bị hỏng rồi, bấm 'Đồng ý' đi mà! 💕",
+        "Nút này biết né đó nha, chị không bấm được đâu xíii!",
+        "Mỹ ơi suy nghĩ lại lần nữa đi màaa...",
+        "Đồng ý đi em mời trà sữa chăn trâu liền nè! 🧋",
+        "Thôi bấm 'Đồng ý' bên kia cho lẹ nè chị ơi! 🎉"
+    ];
+
+    // Main App Config
+    let config = {
+        scaleMultiplier: 1.0,
+        rotSpeedMultiplier: 1.0,
+        pulseSpeedMultiplier: 1.0,
+        particleCount: 4500,
+        trailEnabled: true,
+        beatReactEnabled: true,
+        bgMode: 'stars',
+        themeIndex: 0,
+        volume: 0.8
+    };
+
+    // Color Palettes Matrix
+    const colorThemes = [
+        ["#200109", "#590d22", "#800f2f", "#a4133d", "#c9184a", "#ff4d6d", "#ff88a5", "#ffffff"], // Classic Crimson
+        ["#03045e", "#0077b6", "#00b4d8", "#90e0ef", "#caf0f8", "#4cc9f0", "#7209b7", "#ffffff"], // Cyber Neon
+        ["#2d00f7", "#6b00f7", "#a100f7", "#d800f7", "#f700n7", "#ff007f", "#ff88a5", "#ffffff"], // Violet Passion
+        ["#38b000", "#70e000", "#9ef01a", "#ccff33", "#ffff33", "#ff9100", "#ff5400", "#ffffff"]  // Gold Emerald
+    ];
+
+    let currentGradient = colorThemes[0];
+
+    /* ==========================================================================
+       9. DOM ELEMENT REFERENCES
+       ========================================================================== */
     const introScreen = document.getElementById('intro-screen');
-    const questionBox = document.getElementById('question-box');
+    const questionCard = document.getElementById('question-card');
+    const teaserText = document.getElementById('teaser-text');
     const btnYes = document.getElementById('btn-yes');
     const btnNo = document.getElementById('btn-no');
-    const hud = document.getElementById('hud');
-    const hintText = document.getElementById('hint-text');
-    const btnLetter = document.getElementById('btn-letter');
-    const btnReset = document.getElementById('btn-reset');
+    const hudNavbar = document.getElementById('hud-navbar');
+    const toastContainer = document.getElementById('toast-container');
+
+    const btnSettings = document.getElementById('btn-settings');
     const btnMusic = document.getElementById('btn-music');
-    const modal = document.getElementById('modal');
-    const letterBody = document.getElementById('letter-body');
-    const closeModal = document.getElementById('close-modal');
+    const btnLetter = document.getElementById('btn-letter');
+    const btnPreset = document.getElementById('btn-preset');
+    const btnReset = document.getElementById('btn-reset');
+
+    const modalLetter = document.getElementById('modal-letter');
+    const modalSettings = document.getElementById('modal-settings');
+    const letterTextContainer = document.getElementById('letter-text-container');
+    const closeLetter = document.getElementById('close-letter');
+    const closeSettings = document.getElementById('close-settings');
     const bgm = document.getElementById('bgm');
 
-    let yesScale = 1.0;
+    // Controls DOM
+    const sliderScale = document.getElementById('slider-scale');
+    const sliderRot = document.getElementById('slider-rot');
+    const sliderPulse = document.getElementById('slider-pulse');
+    const sliderDensity = document.getElementById('slider-density');
+    const sliderTrail = document.getElementById('slider-trail');
+    const sliderBeat = document.getElementById('slider-beat');
+    const sliderVol = document.getElementById('slider-vol');
+    const selectBgMode = document.getElementById('select-bg-mode');
 
-    // --- Sửa logic nút né tránh chuẩn xác ---
+    const lblScale = document.getElementById('lbl-scale');
+    const lblRot = document.getElementById('lbl-rot');
+    const lblPulse = document.getElementById('lbl-pulse');
+    const lblDensity = document.getElementById('lbl-density');
+    const lblTrail = document.getElementById('lbl-trail');
+    const lblBeat = document.getElementById('lbl-beat');
+    const lblVol = document.getElementById('lbl-vol');
+
+    let yesBtnScale = 1.0;
+    let teaseIndex = 0;
+
+    /* ==========================================================================
+       10. UTILITY & TOAST SYSTEM
+       ========================================================================== */
+    function showToast(message) {
+        const toast = document.createElement('div');
+        toast.className = 'toast-item';
+        toast.innerText = message;
+        toastContainer.appendChild(toast);
+        setTimeout(() => toast.remove(), 3000);
+    }
+
+    /* ==========================================================================
+       11. INTRO SCREEN DODGING BUTTON ALGORITHM
+       ========================================================================== */
     function moveNoButton() {
-        const boxRect = questionBox.getBoundingClientRect();
+        const cardRect = questionCard.getBoundingClientRect();
         const btnRect = btnNo.getBoundingClientRect();
 
-        const maxX = boxRect.width - btnRect.width - 20;
-        const maxY = boxRect.height - btnRect.height - 20;
+        const maxX = cardRect.width - btnRect.width - 20;
+        const maxY = cardRect.height - btnRect.height - 20;
 
         const newX = Math.max(10, Math.floor(Math.random() * maxX));
         const newY = Math.max(10, Math.floor(Math.random() * maxY));
@@ -279,10 +665,14 @@
         btnNo.style.left = `${newX}px`;
         btnNo.style.top = `${newY}px`;
 
-        // Phóng to nút Đồng Ý mỗi lần nút Không né tránh
-        yesScale += 0.1;
-        if (yesScale < 2.2) {
-            btnYes.style.transform = `scale(${yesScale})`;
+        // Teaser text rotation
+        teaserText.innerText = teaseMessages[teaseIndex % teaseMessages.length];
+        teaseIndex++;
+
+        // Grow "YES" button exponentially
+        yesBtnScale += 0.12;
+        if (yesBtnScale < 2.5) {
+            btnYes.style.transform = `scale(${yesBtnScale})`;
         }
     }
 
@@ -292,60 +682,67 @@
         moveNoButton();
     });
 
-    btnYes.addEventListener('click', startMainExperience);
-
-    function startMainExperience() {
+    btnYes.addEventListener('click', () => {
         introScreen.style.opacity = '0';
         setTimeout(() => {
             introScreen.style.visibility = 'hidden';
-            hud.style.display = 'flex';
-            hintText.style.display = 'block';
+            hudNavbar.style.display = 'flex';
+            showToast("Chào mừng chị Trương Gia Mỹ! 💕");
         }, 800);
 
-        bgm.play().catch(() => { btnMusic.innerText = "Bật Nhạc 🎵"; });
-    }
-
-    btnMusic.addEventListener('click', () => {
-        if (bgm.paused) {
-            bgm.play();
-            btnMusic.innerText = "Tắt Nhạc 🎵";
-        } else {
-            bgm.pause();
-            btnMusic.innerText = "Bật Nhạc 🎵";
-        }
+        bgm.volume = config.volume;
+        bgm.play().catch(() => {
+            btnMusic.querySelector('span').innerText = "🎵";
+            btnMusic.childNodes[1].nodeValue = " Bật Nhạc";
+        });
     });
 
-    // --- Background Ambient ---
+    /* ==========================================================================
+       12. AMBIENT BACKGROUND & MOUSE TRAIL CANVAS ENGINES
+       ========================================================================== */
     const bgCanvas = document.getElementById('bgCanvas');
     const bgCtx = bgCanvas.getContext('2d');
     let bgParticles = [];
 
-    function resizeBg() {
+    const trailCanvas = document.getElementById('trailCanvas');
+    const trailCtx = trailCanvas.getContext('2d');
+    let trailParticles = [];
+
+    function resizeBackgroundCanvases() {
         bgCanvas.width = window.innerWidth;
         bgCanvas.height = window.innerHeight;
+        trailCanvas.width = window.innerWidth;
+        trailCanvas.height = window.innerHeight;
     }
 
     function initBgParticles() {
         bgParticles = [];
-        for (let i = 0; i < 70; i++) {
+        const count = window.innerWidth < 768 ? 40 : 80;
+        for (let i = 0; i < count; i++) {
             bgParticles.push({
                 x: Math.random() * bgCanvas.width,
                 y: Math.random() * bgCanvas.height,
-                size: Math.random() * 2 + 0.5,
-                speedY: Math.random() * 0.8 + 0.2,
-                opacity: Math.random() * 0.6 + 0.2
+                size: Math.random() * 2.5 + 0.5,
+                speedY: Math.random() * 0.7 + 0.2,
+                speedX: (Math.random() - 0.5) * 0.3,
+                opacity: Math.random() * 0.7 + 0.2
             });
         }
     }
 
     function renderBg() {
         bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-        bgCtx.fillStyle = '#ffb3c1';
-
+        
         for (let p of bgParticles) {
             p.y += p.speedY;
+            p.x += p.speedX;
+
             if (p.y > bgCanvas.height) p.y = 0;
+            if (p.x > bgCanvas.width) p.x = 0;
+            if (p.x < 0) p.x = bgCanvas.width;
+
             bgCtx.globalAlpha = p.opacity;
+            bgCtx.fillStyle = config.bgMode === 'hearts' ? '#ff4d6d' : '#ffccd5';
             bgCtx.beginPath();
             bgCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
             bgCtx.fill();
@@ -353,7 +750,47 @@
         requestAnimationFrame(renderBg);
     }
 
-    // --- 3D Heart Engine ---
+    // Mouse Glitter Trail Engine
+    window.addEventListener('mousemove', (e) => {
+        if (!config.trailEnabled) return;
+        for (let i = 0; i < 2; i++) {
+            trailParticles.push({
+                x: e.clientX,
+                y: e.clientY,
+                size: Math.random() * 4 + 1,
+                vx: (Math.random() - 0.5) * 1.5,
+                vy: (Math.random() - 0.5) * 1.5 - 0.5,
+                life: 1.0,
+                color: currentGradient[Math.floor(Math.random() * currentGradient.length)]
+            });
+        }
+    });
+
+    function renderTrail() {
+        trailCtx.clearRect(0, 0, trailCanvas.width, trailCanvas.height);
+        for (let i = trailParticles.length - 1; i >= 0; i--) {
+            let p = trailParticles[i];
+            p.x += p.vx;
+            p.y += p.vy;
+            p.life -= 0.025;
+
+            if (p.life <= 0) {
+                trailParticles.splice(i, 1);
+                continue;
+            }
+
+            trailCtx.globalAlpha = p.life;
+            trailCtx.fillStyle = p.color;
+            trailCtx.beginPath();
+            trailCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            trailCtx.fill();
+        }
+        requestAnimationFrame(renderTrail);
+    }
+
+    /* ==========================================================================
+       13. 3D HEART RENDERING & MATH ENGINE
+       ========================================================================== */
     const canvas = document.getElementById('heartCanvas');
     const ctx = canvas.getContext('2d');
 
@@ -361,17 +798,17 @@
     let rotX = 0.2, rotY = 0;
     let isDragging = false;
     let lastMouseX = 0, lastMouseY = 0;
-    const gradientColors = ["#200109", "#590d22", "#800f2f", "#a4133d", "#c9184a", "#ff4d6d", "#ff88a5", "#ffffff"];
 
     function initHeartPoints() {
         points = [];
         const isMobile = window.innerWidth < 768;
-        const totalPoints = isMobile ? 2200 : 4200;
+        const totalPoints = isMobile ? Math.min(config.particleCount, 2800) : config.particleCount;
 
         for (let i = 0; i < totalPoints; i++) {
             let u = Math.random() * Math.PI * 2;
             let v = (Math.random() - 0.5) * Math.PI;
             
+            // Parametric 3D Heart Equation
             let cosV = Math.pow(Math.abs(Math.cos(v)), 0.35);
             let x = 16 * Math.pow(Math.sin(u), 3) * cosV;
             let y = -(13 * Math.cos(u) - 5 * Math.cos(2*u) - 2 * Math.cos(3*u) - Math.cos(4*u)) * cosV;
@@ -387,11 +824,12 @@
         }
     }
 
-    function resizeHeart() {
+    function resizeHeartCanvas() {
         canvas.width = window.innerWidth;
         canvas.height = window.innerHeight;
     }
 
+    // Touch & Mouse Drag Handlers
     window.addEventListener('mousedown', (e) => {
         isDragging = true;
         lastMouseX = e.clientX;
@@ -436,21 +874,22 @@
         ctx.fillRect(0, 0, canvas.width, canvas.height);
 
         if (!isDragging) {
-            rotY += 0.008;
-            rotX += 0.002;
+            rotY += 0.008 * config.rotSpeedMultiplier;
+            rotX += 0.002 * config.rotSpeedMultiplier;
         }
 
         frameCount++;
-        let pulse = 1 + 0.07 * Math.sin(frameCount * 0.06);
+        let pulse = 1 + 0.07 * Math.sin(frameCount * 0.06 * config.pulseSpeedMultiplier);
 
         let projected = [];
         let fov = 480;
 
         for (let p of points) {
-            let x = p.x * pulse;
-            let y = p.y * pulse;
-            let z = p.z * pulse;
+            let x = p.x * pulse * config.scaleMultiplier;
+            let y = p.y * pulse * config.scaleMultiplier;
+            let z = p.z * pulse * config.scaleMultiplier;
 
+            // Matrix Rotation Calculations
             let x1 = x * Math.cos(rotY) + z * Math.sin(rotY);
             let z1 = -x * Math.sin(rotY) + z * Math.cos(rotY);
 
@@ -471,69 +910,163 @@
             }
         }
 
+        // Z-Index Sorting
         projected.sort((a, b) => a.z - b.z);
 
+        // Render Particles
         for (let p of projected) {
-            let colorIdx = Math.floor(((p.z + 160) / 320) * (gradientColors.length - 1));
-            colorIdx = Math.max(0, Math.min(gradientColors.length - 1, colorIdx));
+            let colorIdx = Math.floor(((p.z + 160) / 320) * (currentGradient.length - 1));
+            colorIdx = Math.max(0, Math.min(currentGradient.length - 1, colorIdx));
             
-            ctx.fillStyle = gradientColors[colorIdx];
+            ctx.fillStyle = currentGradient[colorIdx];
             ctx.fillRect(p.sx, p.sy, p.sz, p.sz);
         }
 
-        ctx.font = "bold 24px -apple-system, sans-serif";
+        // Render Name in 3D Center
+        ctx.font = "bold 26px -apple-system, sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
         ctx.fillStyle = "rgba(255, 240, 243, 0.95)";
-        ctx.shadowColor = "#ff4d6d";
-        ctx.shadowBlur = 12;
+        ctx.shadowColor = currentGradient[5] || "#ff4d6d";
+        ctx.shadowBlur = 14;
         ctx.fillText(TARGET_NAME, canvas.width / 2, canvas.height / 2);
         ctx.shadowBlur = 0;
 
         requestAnimationFrame(renderHeart);
     }
 
-    // --- Letter Typewriter ---
+    /* ==========================================================================
+       14. TYPEWRITER LETTER ENGINE
+       ========================================================================== */
     btnLetter.addEventListener('click', () => {
-        modal.style.display = 'block';
-        letterBody.innerText = '';
+        modalLetter.style.display = 'block';
+        letterTextContainer.innerText = '';
         let index = 0;
+
         function type() {
             if (index < letterTextContent.length) {
-                letterBody.innerText += letterTextContent.charAt(index);
+                letterTextContainer.innerText += letterTextContent.charAt(index);
                 index++;
-                setTimeout(type, 32);
+                setTimeout(type, 30);
             }
         }
         type();
     });
 
-    closeModal.addEventListener('click', () => modal.style.display = 'none');
+    closeLetter.addEventListener('click', () => modalLetter.style.display = 'none');
 
-    // Reset
-    btnReset.addEventListener('click', () => {
-        modal.style.display = 'none';
-        hud.style.display = 'none';
-        hintText.style.display = 'none';
-        introScreen.style.visibility = 'visible';
-        introScreen.style.opacity = '1';
-        btnNo.style.left = '60%';
-        btnNo.style.top = '30px';
-        yesScale = 1.0;
-        btnYes.style.transform = 'scale(1)';
+    /* ==========================================================================
+       15. TABBED SETTINGS CONTROLLERS
+       ========================================================================== */
+    btnSettings.addEventListener('click', () => modalSettings.style.display = 'block');
+    closeSettings.addEventListener('click', () => modalSettings.style.display = 'none');
+
+    // Tab Navigation Switcher
+    document.querySelectorAll('.tab-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+            btn.classList.add('active');
+            document.getElementById(btn.dataset.tab).classList.add('active');
+        });
     });
 
-    window.addEventListener('resize', () => {
-        resizeBg();
-        resizeHeart();
+    // Slider Listeners
+    sliderScale.addEventListener('input', (e) => {
+        config.scaleMultiplier = parseFloat(e.target.value);
+        lblScale.innerText = `${config.scaleMultiplier.toFixed(2)}x`;
+    });
+
+    sliderRot.addEventListener('input', (e) => {
+        config.rotSpeedMultiplier = parseFloat(e.target.value);
+        lblRot.innerText = `${config.rotSpeedMultiplier.toFixed(1)}x`;
+    });
+
+    sliderPulse.addEventListener('input', (e) => {
+        config.pulseSpeedMultiplier = parseFloat(e.target.value);
+        lblPulse.innerText = `${config.pulseSpeedMultiplier.toFixed(1)}x`;
+    });
+
+    sliderDensity.addEventListener('input', (e) => {
+        config.particleCount = parseInt(e.target.value);
+        lblDensity.innerText = `${config.particleCount} hạt`;
         initHeartPoints();
     });
 
-    resizeBg();
-    resizeHeart();
+    sliderTrail.addEventListener('input', (e) => {
+        config.trailEnabled = parseInt(e.target.value) === 1;
+        lblTrail.innerText = config.trailEnabled ? "Bật" : "Tắt";
+    });
+
+    sliderBeat.addEventListener('input', (e) => {
+        config.beatReactEnabled = parseInt(e.target.value) === 1;
+        lblBeat.innerText = config.beatReactEnabled ? "Bật" : "Tắt";
+    });
+
+    sliderVol.addEventListener('input', (e) => {
+        config.volume = parseFloat(e.target.value);
+        bgm.volume = config.volume;
+        lblVol.innerText = `${Math.round(config.volume * 100)}%`;
+    });
+
+    selectBgMode.addEventListener('change', (e) => {
+        config.bgMode = e.target.value;
+        initBgParticles();
+    });
+
+    // Theme Palette Switcher
+    btnPreset.addEventListener('click', () => {
+        config.themeIndex = (config.themeIndex + 1) % colorThemes.length;
+        currentGradient = colorThemes[config.themeIndex];
+        showToast(`Đã đổi bảng màu ${config.themeIndex + 1} 🎨`);
+    });
+
+    // Toggle Audio
+    btnMusic.addEventListener('click', () => {
+        if (bgm.paused) {
+            bgm.play();
+            btnMusic.querySelector('span').innerText = "🎵";
+            btnMusic.childNodes[1].nodeValue = " Tắt Nhạc";
+        } else {
+            bgm.pause();
+            btnMusic.querySelector('span').innerText = "🔇";
+            btnMusic.childNodes[1].nodeValue = " Bật Nhạc";
+        }
+    });
+
+    // Reset Experience
+    btnReset.addEventListener('click', () => {
+        modalLetter.style.display = 'none';
+        modalSettings.style.display = 'none';
+        hudNavbar.style.display = 'none';
+        introScreen.style.visibility = 'visible';
+        introScreen.style.opacity = '1';
+        btnNo.style.left = '56%';
+        btnNo.style.top = '40px';
+        yesBtnScale = 1.0;
+        btnYes.style.transform = 'scale(1)';
+        teaserText.innerText = 'Hãy chọn câu trả lời thật lòng nha... ✨';
+        teaseIndex = 0;
+        showToast("Đã khởi động lại màn hình!");
+    });
+
+    /* ==========================================================================
+       16. INITIALIZATION & RESIZE HANDLERS
+       ========================================================================== */
+    window.addEventListener('resize', () => {
+        resizeBackgroundCanvases();
+        resizeHeartCanvas();
+        initBgParticles();
+        initHeartPoints();
+    });
+
+    // Execution Flow Start
+    resizeBackgroundCanvases();
+    resizeHeartCanvas();
     initBgParticles();
     initHeartPoints();
     renderBg();
+    renderTrail();
     renderHeart();
 </script>
 </body>
