@@ -3,278 +3,508 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chị Mỹ để ý em 1 tí 💖</title>
+    <title>Dành Riêng Cho Trương Gia Mỹ 💖</title>
     <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            background-color: #0a0307;
-            color: #fff0f3;
-            font-family: Arial, sans-serif;
-            overflow: hidden;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            height: 100vh;
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            user-select: none;
+            -webkit-user-select: none;
         }
-        #app-container {
-            position: relative;
+
+        body {
+            background-color: #050106;
+            color: #fff0f3;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            overflow: hidden;
             width: 100vw;
             height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
         }
-        /* Screen 1: Question */
-        #start-screen {
-            position: absolute;
-            text-align: center;
-            z-index: 10;
-        }
-        h1 {
-            font-size: 2rem;
-            color: #ffb3c1;
-            margin-bottom: 30px;
-            text-shadow: 0 0 10px #c9184a;
-        }
-        .btn {
-            padding: 12px 24px;
-            font-size: 1rem;
-            font-weight: bold;
-            color: #ff88a5;
-            background-color: #2b1a22;
-            border: 2px solid #c9184a;
-            border-radius: 8px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: absolute;
-        }
-        .btn:hover {
-            background-color: #422332;
-            color: #ffb3c1;
-            box-shadow: 0 0 15px #ff4d6d;
-        }
-        #btn-yes { left: -110px; top: 60px; }
-        #btn-no { left: 30px; top: 60px; }
-        
-        /* Screen 2: 3D Canvas */
-        canvas {
+
+        /* Ambient background floating canvas */
+        #bgCanvas {
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
+            z-index: 1;
+            pointer-events: none;
         }
-        #ui-layer {
+
+        /* Main 3D Canvas */
+        #heartCanvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 2;
+            cursor: grab;
+        }
+
+        #heartCanvas:active {
+            cursor: grabbing;
+        }
+
+        /* Screen 1: Intro Question */
+        #intro-screen {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: 10;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            background: rgba(5, 1, 6, 0.85);
+            backdrop-filter: blur(8px);
+            transition: opacity 0.8s ease, visibility 0.8s ease;
+        }
+
+        .question-box {
+            text-align: center;
+            padding: 40px;
+            background: rgba(255, 255, 255, 0.03);
+            border: 1px solid rgba(255, 77, 109, 0.3);
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(201, 24, 74, 0.2);
+            max-width: 90%;
+            width: 420px;
+        }
+
+        h1 {
+            font-size: 1.8rem;
+            color: #ffb3c1;
+            margin-bottom: 35px;
+            text-shadow: 0 0 12px #ff4d6d;
+            line-height: 1.4;
+        }
+
+        .btn-group {
+            position: relative;
+            width: 100%;
+            height: 80px;
+        }
+
+        .btn {
+            padding: 12px 28px;
+            font-size: 1rem;
+            font-weight: 600;
+            color: #ffffff;
+            background: linear-gradient(135deg, #c9184a, #ff4d6d);
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+            box-shadow: 0 0 15px rgba(255, 77, 109, 0.4);
+            transition: transform 0.2s, box-shadow 0.2s;
+            position: absolute;
+        }
+
+        .btn:hover {
+            transform: scale(1.05);
+            box-shadow: 0 0 25px rgba(255, 77, 109, 0.8);
+        }
+
+        #btn-yes {
+            left: 15%;
+            top: 15px;
+        }
+
+        #btn-no {
+            right: 15%;
+            top: 15px;
+            background: linear-gradient(135deg, #3a0ca3, #4cc9f0);
+            box-shadow: 0 0 15px rgba(76, 201, 240, 0.4);
+        }
+
+        /* HUD Navigation Overlay */
+        #hud {
             position: absolute;
             top: 20px;
             right: 20px;
-            z-index: 20;
+            z-index: 5;
             display: none;
-            gap: 10px;
+            gap: 12px;
         }
-        .nav-btn {
-            position: static;
-            padding: 8px 16px;
-            font-size: 0.9rem;
+
+        .hud-btn {
+            position: relative;
+            padding: 10px 18px;
+            font-size: 0.85rem;
+            background: rgba(24, 10, 18, 0.7);
+            border: 1px solid rgba(255, 77, 109, 0.5);
+            backdrop-filter: blur(5px);
+            border-radius: 20px;
+            color: #ffccd5;
+            cursor: pointer;
+            transition: all 0.3s;
         }
-        
-        /* Modal Letter */
+
+        .hud-btn:hover {
+            background: rgba(201, 24, 74, 0.6);
+            color: #fff;
+            box-shadow: 0 0 15px #ff4d6d;
+        }
+
+        /* Letter Modal */
         #modal {
             display: none;
             position: absolute;
-            z-index: 30;
-            width: 340px;
-            background: #180a12;
-            border: 2px solid #c9184a;
-            border-radius: 12px;
-            padding: 20px;
-            box-shadow: 0 0 20px rgba(201, 24, 74, 0.5);
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 20;
+            width: 90%;
+            max-width: 450px;
+            background: rgba(15, 4, 11, 0.92);
+            border: 1px solid #ff4d6d;
+            border-radius: 16px;
+            padding: 25px;
+            box-shadow: 0 0 40px rgba(255, 77, 109, 0.4);
+            backdrop-filter: blur(10px);
+        }
+
+        #modal h2 {
+            color: #ff88a5;
+            font-size: 1.2rem;
             text-align: center;
+            margin-bottom: 15px;
+            text-shadow: 0 0 8px #c9184a;
         }
-        #modal h2 { color: #ff88a5; margin-bottom: 12px; font-size: 1.1rem; }
-        #letter-text {
-            color: #fff0f3;
+
+        #letter-body {
             font-size: 0.95rem;
-            line-height: 1.5;
-            text-align: left;
-            min-height: 120px;
+            line-height: 1.6;
+            color: #fff0f3;
+            min-height: 140px;
             white-space: pre-wrap;
+            border-top: 1px dashed rgba(255, 179, 193, 0.3);
+            padding-top: 15px;
         }
+
         #close-modal {
-            margin-top: 15px;
+            margin: 20px auto 0 auto;
+            display: block;
             position: static;
+        }
+
+        /* Hint Text */
+        #hint-text {
+            position: absolute;
+            bottom: 20px;
+            width: 100%;
+            text-align: center;
+            font-size: 0.8rem;
+            color: rgba(255, 204, 213, 0.5);
+            z-index: 3;
+            pointer-events: none;
+            display: none;
         }
     </style>
 </head>
 <body>
 
-<div id="app-container">
-    <!-- Màn hình 1 -->
-    <div id="start-screen">
-        <h1>Chị đồng ý làm bạn em nha 💕</h1>
-        <div style="position: relative; width: 200px; height: 120px; margin: 0 auto;">
-            <button id="btn-yes" class="btn">Đồng ý 💖</button>
-            <button id="btn-no" class="btn">Không đồng ý ❌</button>
+    <!-- Canvas Hạt Nền Ambient -->
+    <canvas id="bgCanvas"></canvas>
+
+    <!-- Canvas Trái Tim 3D -->
+    <canvas id="heartCanvas"></canvas>
+
+    <!-- Màn hình câu hỏi đầu tiên -->
+    <div id="intro-screen">
+        <div class="question-box">
+            <h1>Chị Trương Gia Mỹ đồng ý làm bạn em nha? 💕</h1>
+            <div class="btn-group" id="btn-container">
+                <button id="btn-yes" class="btn">Đồng ý 💖</button>
+                <button id="btn-no" class="btn">Không ❌</button>
+            </div>
         </div>
     </div>
 
-    <!-- Màn hình 2 -->
-    <canvas id="canvas3d"></canvas>
-
-    <div id="ui-layer">
-        <button id="btn-letter" class="btn nav-btn">Xem Thư 💌</button>
-        <button id="btn-reset" class="btn nav-btn">Làm lại 🔄</button>
+    <!-- Thanh điều khiển HUD -->
+    <div id="hud">
+        <button id="btn-music" class="hud-btn">Tắt Nhạc 🎵</button>
+        <button id="btn-letter" class="hud-btn">Xem Thư 💌</button>
+        <button id="btn-reset" class="hud-btn">Làm lại 🔄</button>
     </div>
 
-    <!-- Thư tình Modal -->
+    <div id="hint-text">✨ Nhấp và kéo chuột/tay để xoay trái tim 3D ✨</div>
+
+    <!-- Cửa sổ Thư Tình -->
     <div id="modal">
         <h2>💌 THƯ TÌNH DÀNH RIÊNG CHO MỸ 💌</h2>
-        <div id="letter-text"></div>
-        <button id="close-modal" class="btn nav-btn">Đóng thư 💕</button>
+        <div id="letter-body"></div>
+        <button id="close-modal" class="btn hud-btn">Đóng thư 💕</button>
     </div>
-</div>
+
+    <!-- Nhạc nền romantic -->
+    <audio id="bgm" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=sweet-love-111578.mp3"></audio>
 
 <script>
     const TARGET_NAME = "Trương Gia Mỹ";
-    const letterContent = `Gửi chị ${TARGET_NAME},\n\nEm tạo chiếc app nhỏ này chỉ dành riêng cho chị thôi!\nCảm ơn chị vì đã luôn xuất hiện thật rạng rỡ và đem lại nhiều niềm vui.\nChúc chị luôn xinh đẹp, hạnh phúc và có những ngày thật ngọt ngào nha!\n\nFrom your secret admirer with 💖`;
+    const letterTextContent = `Gửi chị ${TARGET_NAME},\n\nEm tạo chiếc app nhỏ này chỉ dành riêng cho chị thôi!\nCảm ơn chị vì đã luôn xuất hiện thật rạng rỡ và đem lại nhiều niềm vui.\n\nChúc chị luôn xinh đẹp, hạnh phúc và có những ngày thật ngọt ngào nha!\n\nFrom your secret admirer with 💖`;
 
-    const startScreen = document.getElementById('start-screen');
+    // Elements
+    const introScreen = document.getElementById('intro-screen');
     const btnYes = document.getElementById('btn-yes');
     const btnNo = document.getElementById('btn-no');
-    const uiLayer = document.getElementById('ui-layer');
+    const btnContainer = document.getElementById('btn-container');
+    const hud = document.getElementById('hud');
+    const hintText = document.getElementById('hint-text');
     const btnLetter = document.getElementById('btn-letter');
     const btnReset = document.getElementById('btn-reset');
+    const btnMusic = document.getElementById('btn-music');
     const modal = document.getElementById('modal');
-    const letterText = document.getElementById('letter-text');
+    const letterBody = document.getElementById('letter-body');
     const closeModal = document.getElementById('close-modal');
-    const canvas = document.getElementById('canvas3d');
+    const bgm = document.getElementById('bgm');
+
+    let isAudioPlaying = true;
+
+    // --- Nút Né Tránh (Dodge Button Logic) ---
+    function moveNoButton() {
+        const containerRect = btnContainer.getBoundingClientRect();
+        const maxX = containerRect.width - btnNo.offsetWidth;
+        const maxY = containerRect.height - btnNo.offsetHeight;
+
+        const newX = Math.random() * (maxX - 20);
+        const newY = Math.random() * (maxY - 20);
+
+        btnNo.style.left = `${newX}px`;
+        btnNo.style.top = `${newY}px`;
+    }
+
+    btnNo.addEventListener('mouseenter', moveNoButton);
+    btnNo.addEventListener('touchstart', (e) => { e.preventDefault(); moveNoButton(); });
+
+    btnYes.addEventListener('click', startMainExperience);
+
+    function startMainExperience() {
+        introScreen.style.opacity = '0';
+        setTimeout(() => {
+            introScreen.style.visibility = 'hidden';
+            hud.style.display = 'flex';
+            hintText.style.display = 'block';
+        }, 800);
+
+        // Bật nhạc nền
+        bgm.play().catch(() => { isAudioPlaying = false; btnMusic.innerText = "Bật Nhạc 🎵"; });
+    }
+
+    // Toggle Nhạc
+    btnMusic.addEventListener('click', () => {
+        if (bgm.paused) {
+            bgm.play();
+            btnMusic.innerText = "Tắt Nhạc 🎵";
+        } else {
+            bgm.pause();
+            btnMusic.innerText = "Bật Nhạc 🎵";
+        }
+    });
+
+    // --- Ambient Background Particles (Mưa sao/hoa rơi) ---
+    const bgCanvas = document.getElementById('bgCanvas');
+    const bgCtx = bgCanvas.getContext('2d');
+    let bgParticles = [];
+
+    function resizeBg() {
+        bgCanvas.width = window.innerWidth;
+        bgCanvas.height = window.innerHeight;
+    }
+
+    function initBgParticles() {
+        bgParticles = [];
+        for (let i = 0; i < 80; i++) {
+            bgParticles.push({
+                x: Math.random() * bgCanvas.width,
+                y: Math.random() * bgCanvas.height,
+                size: Math.random() * 2 + 0.5,
+                speedY: Math.random() * 0.8 + 0.2,
+                opacity: Math.random() * 0.6 + 0.2
+            });
+        }
+    }
+
+    function renderBg() {
+        bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
+        bgCtx.fillStyle = '#ffb3c1';
+
+        for (let p of bgParticles) {
+            p.y += p.speedY;
+            if (p.y > bgCanvas.height) p.y = 0;
+            bgCtx.globalAlpha = p.opacity;
+            bgCtx.beginPath();
+            bgCtx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            bgCtx.fill();
+        }
+        requestAnimationFrame(renderBg);
+    }
+
+    // --- 3D Heart Engine (Tương đương 1000 dòng Python) ---
+    const canvas = document.getElementById('heartCanvas');
     const ctx = canvas.getContext('2d');
 
-    let isMoving = false;
-    let dx = 5, dy = 4;
-    let yesX = -110, yesY = 60;
-    let animId = null;
+    let points = [];
+    let rotX = 0.2, rotY = 0;
+    let isDragging = false;
+    let lastMouseX = 0, lastMouseY = 0;
+    const gradientColors = ["#200109", "#590d22", "#800f2f", "#a4133d", "#c9184a", "#ff4d6d", "#ff88a5", "#ffffff"];
 
-    // --- Nút né tránh ---
-    function moveYes() {
-        if (!isMoving) return;
-        yesX += dx;
-        yesY += dy;
-        if (yesX < -200 || yesX > 200) dx = -dx;
-        if (yesY < -150 || yesY > 200) dy = -dy;
-        btnYes.style.left = yesX + 'px';
-        btnYes.style.top = yesY + 'px';
-        requestAnimationFrame(moveYes);
-    }
-
-    btnNo.addEventListener('mouseenter', () => {
-        btnNo.style.display = 'none';
-        if (!isMoving) { isMoving = true; moveYes(); }
-    });
-
-    btnYes.addEventListener('click', () => {
-        if (!isMoving) {
-            isMoving = true;
-            moveYes();
-        } else {
-            start3D();
-        }
-    });
-
-    // --- 3D Heart Engine ---
-    let width, height, points = [], rotX = 0.2, rotY = 0;
-    const gradientColors = ["#200109", "#590d22", "#a4133d", "#c9184a", "#ff4d6d", "#ffccd5"];
-
-    function initPoints() {
+    function initHeartPoints() {
         points = [];
-        const count = window.innerWidth < 600 ? 1800 : 3500;
-        for (let i = 0; i < count; i++) {
+        const isMobile = window.innerWidth < 768;
+        const totalPoints = isMobile ? 2200 : 4500;
+
+        for (let i = 0; i < totalPoints; i++) {
             let u = Math.random() * Math.PI * 2;
             let v = (Math.random() - 0.5) * Math.PI;
-            let cosV = Math.pow(Math.abs(Math.cos(v)), 0.38);
+            
+            // Công thức hình học Parametric Trái Tim 3D
+            let cosV = Math.pow(Math.abs(Math.cos(v)), 0.35);
             let x = 16 * Math.pow(Math.sin(u), 3) * cosV;
             let y = -(13 * Math.cos(u) - 5 * Math.cos(2*u) - 2 * Math.cos(3*u) - Math.cos(4*u)) * cosV;
-            let z = 6.8 * Math.sin(v);
-            
-            let scale = Math.random() < 0.4 ? Math.cbrt(Math.random()) : 1.0;
-            points.push({ x: x * 8 * scale, y: y * 8 * scale, z: z * 8 * scale, size: Math.random() > 0.8 ? 2 : 1 });
+            let z = 6.5 * Math.sin(v);
+
+            // Mật độ hạt phân bổ đều bên trong
+            let scale = Math.random() < 0.45 ? Math.cbrt(Math.random()) : 1.0;
+            points.push({
+                x: x * 9.5 * scale,
+                y: y * 9.5 * scale,
+                z: z * 9.5 * scale,
+                baseSize: Math.random() > 0.85 ? 2.2 : 1.2
+            });
         }
     }
 
-    function resize() {
-        width = canvas.width = window.innerWidth;
-        height = canvas.height = window.innerHeight;
+    function resizeHeart() {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
     }
 
-    function render(frame) {
-        ctx.fillStyle = '#0a0307';
-        ctx.fillRect(0, 0, width, height);
+    // Tương tác Xoay Trái Tim bằng Chuột / Cảm ứng
+    window.addEventListener('mousedown', (e) => {
+        isDragging = true;
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+    });
 
-        rotY += 0.015;
-        rotX += 0.005;
-        let pulse = 1 + 0.08 * Math.sin(frame * 0.08);
+    window.addEventListener('mousemove', (e) => {
+        if (!isDragging) return;
+        let deltaX = e.clientX - lastMouseX;
+        let deltaY = e.clientY - lastMouseY;
+        rotY += deltaX * 0.005;
+        rotX += deltaY * 0.005;
+        lastMouseX = e.clientX;
+        lastMouseY = e.clientY;
+    });
+
+    window.addEventListener('mouseup', () => isDragging = false);
+
+    window.addEventListener('touchstart', (e) => {
+        if (e.touches.length === 1) {
+            isDragging = true;
+            lastMouseX = e.touches[0].clientX;
+            lastMouseY = e.touches[0].clientY;
+        }
+    });
+
+    window.addEventListener('touchmove', (e) => {
+        if (!isDragging || e.touches.length !== 1) return;
+        let deltaX = e.touches[0].clientX - lastMouseX;
+        let deltaY = e.touches[0].clientY - lastMouseY;
+        rotY += deltaX * 0.005;
+        rotX += deltaY * 0.005;
+        lastMouseX = e.touches[0].clientX;
+        lastMouseY = e.touches[0].clientY;
+    });
+
+    window.addEventListener('touchend', () => isDragging = false);
+
+    // Vòng lặp Render 3D
+    let frameCount = 0;
+    function renderHeart() {
+        ctx.fillStyle = '#050106';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        if (!isDragging) {
+            rotY += 0.008; // Auto rotate Y
+            rotX += 0.002; // Auto rotate X
+        }
+
+        frameCount++;
+        // Hiệu ứng Trái tim đập (Heartbeat Pulse)
+        let pulse = 1 + 0.07 * Math.sin(frameCount * 0.06);
 
         let projected = [];
-        let fov = 450;
+        let fov = 480;
 
         for (let p of points) {
             let x = p.x * pulse;
             let y = p.y * pulse;
             let z = p.z * pulse;
 
-            // Rotate Y
+            // Ma trận xoay Y
             let x1 = x * Math.cos(rotY) + z * Math.sin(rotY);
             let z1 = -x * Math.sin(rotY) + z * Math.cos(rotY);
-            // Rotate X
+
+            // Ma trận xoay X
             let y2 = y * Math.cos(rotX) - z1 * Math.sin(rotX);
             let z2 = y * Math.sin(rotX) + z1 * Math.cos(rotX);
 
-            let scale = fov / (z2 + fov + 200);
-            let sx = x1 * scale + width / 2;
-            let sy = y2 * scale + height / 2;
+            // Phép chiếu 3D -> 2D Perspective
+            let scale = fov / (z2 + fov + 220);
+            let sx = x1 * scale + canvas.width / 2;
+            let sy = y2 * scale + canvas.height / 2;
 
-            if (sx >= 0 && sx < width && sy >= 0 && sy < height) {
-                projected.push({ sx, sy, z: z2, sz: Math.max(1, p.size * scale) });
+            if (sx >= 0 && sx < canvas.width && sy >= 0 && sy < canvas.height) {
+                projected.push({
+                    sx: sx,
+                    sy: sy,
+                    z: z2,
+                    sz: Math.max(0.8, p.baseSize * scale)
+                });
             }
         }
 
+        // Sắp xếp chiều sâu (Depth Sorting)
         projected.sort((a, b) => a.z - b.z);
 
+        // Vẽ từng hạt điểm
         for (let p of projected) {
-            let colorIdx = Math.floor(((p.z + 150) / 300) * (gradientColors.length - 1));
+            let colorIdx = Math.floor(((p.z + 160) / 320) * (gradientColors.length - 1));
             colorIdx = Math.max(0, Math.min(gradientColors.length - 1, colorIdx));
+            
             ctx.fillStyle = gradientColors[colorIdx];
             ctx.fillRect(p.sx, p.sy, p.sz, p.sz);
         }
 
-        // Target Name
-        ctx.font = "bold 24px Arial";
+        // Vẽ Tên Trương Gia Mỹ ở trung tâm trái tim
+        ctx.font = "bold 24px -apple-system, sans-serif";
         ctx.textAlign = "center";
-        ctx.fillStyle = "#fff0f3";
-        ctx.fillText(TARGET_NAME, width / 2, height / 2);
+        ctx.textBaseline = "middle";
+        ctx.fillStyle = "rgba(255, 240, 243, 0.95)";
+        ctx.shadowColor = "#ff4d6d";
+        ctx.shadowBlur = 12;
+        ctx.fillText(TARGET_NAME, canvas.width / 2, canvas.height / 2);
+        ctx.shadowBlur = 0; // Reset shadow
 
-        animId = requestAnimationFrame(() => render(frame + 1));
+        requestAnimationFrame(renderHeart);
     }
 
-    function start3D() {
-        startScreen.style.display = 'none';
-        uiLayer.style.display = 'flex';
-        resize();
-        initPoints();
-        window.addEventListener('resize', resize);
-        render(0);
-    }
-
-    // --- Letter Typewriter ---
+    // --- Cửa sổ Thư & Hiệu ứng Gõ Chữ (Typewriter) ---
     btnLetter.addEventListener('click', () => {
         modal.style.display = 'block';
-        letterText.innerText = '';
-        let i = 0;
+        letterBody.innerText = '';
+        let index = 0;
         function type() {
-            if (i < letterContent.length) {
-                letterText.innerText += letterContent.charAt(i);
-                i++;
-                setTimeout(type, 30);
+            if (index < letterTextContent.length) {
+                letterBody.innerText += letterTextContent.charAt(index);
+                index++;
+                setTimeout(type, 32);
             }
         }
         type();
@@ -282,17 +512,31 @@
 
     closeModal.addEventListener('click', () => modal.style.display = 'none');
 
+    // Nút Làm lại
     btnReset.addEventListener('click', () => {
-        cancelAnimationFrame(animId);
         modal.style.display = 'none';
-        uiLayer.style.display = 'none';
-        startScreen.style.display = 'block';
-        btnNo.style.display = 'inline-block';
-        isMoving = false;
-        yesX = -110; yesY = 60;
-        btnYes.style.left = yesX + 'px';
-        btnYes.style.top = yesY + 'px';
+        hud.style.display = 'none';
+        hintText.style.display = 'none';
+        introScreen.style.visibility = 'visible';
+        introScreen.style.opacity = '1';
+        btnNo.style.position = 'absolute';
+        btnNo.style.right = '15%';
+        btnNo.style.top = '15px';
     });
+
+    // Khởi tạo toàn bộ ứng dụng
+    window.addEventListener('resize', () => {
+        resizeBg();
+        resizeHeart();
+        initHeartPoints();
+    });
+
+    resizeBg();
+    resizeHeart();
+    initBgParticles();
+    initHeartPoints();
+    renderBg();
+    renderHeart();
 </script>
 </body>
 </html>
