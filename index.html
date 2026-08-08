@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chị Mỹ để ý em 1 tí 💖</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background-color: #0a0307;
+            color: #fff0f3;
+            font-family: Arial, sans-serif;
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #app-container {
+            position: relative;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        /* Screen 1: Question */
+        #start-screen {
+            position: absolute;
+            text-align: center;
+            z-index: 10;
+        }
+        h1 {
+            font-size: 2rem;
+            color: #ffb3c1;
+            margin-bottom: 30px;
+            text-shadow: 0 0 10px #c9184a;
+        }
+        .btn {
+            padding: 12px 24px;
+            font-size: 1rem;
+            font-weight: bold;
+            color: #ff88a5;
+            background-color: #2b1a22;
+            border: 2px solid #c9184a;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: absolute;
+        }
+        .btn:hover {
+            background-color: #422332;
+            color: #ffb3c1;
+            box-shadow: 0 0 15px #ff4d6d;
+        }
+        #btn-yes { left: -110px; top: 60px; }
+        #btn-no { left: 30px; top: 60px; }
+        
+        /* Screen 2: 3D Canvas */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+        }
+        #ui-layer {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            z-index: 20;
+            display: none;
+            gap: 10px;
+        }
+        .nav-btn {
+            position: static;
+            padding: 8px 16px;
+            font-size: 0.9rem;
+        }
+        
+        /* Modal Letter */
+        #modal {
+            display: none;
+            position: absolute;
+            z-index: 30;
+            width: 340px;
+            background: #180a12;
+            border: 2px solid #c9184a;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 0 20px rgba(201, 24, 74, 0.5);
+            text-align: center;
+        }
+        #modal h2 { color: #ff88a5; margin-bottom: 12px; font-size: 1.1rem; }
+        #letter-text {
+            color: #fff0f3;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            text-align: left;
+            min-height: 120px;
+            white-space: pre-wrap;
+        }
+        #close-modal {
+            margin-top: 15px;
+            position: static;
+        }
+    </style>
+</head>
+<body>
+
+<div id="app-container">
+    <!-- Màn hình 1 -->
+    <div id="start-screen">
+        <h1>Chị đồng ý làm bạn em nha 💕</h1>
+        <div style="position: relative; width: 200px; height: 120px; margin: 0 auto;">
+            <button id="btn-yes" class="btn">Đồng ý 💖</button>
+            <button id="btn-no" class="btn">Không đồng ý ❌</button>
+        </div>
+    </div>
+
+    <!-- Màn hình 2 -->
+    <canvas id="canvas3d"></canvas>
+
+    <div id="ui-layer">
+        <button id="btn-letter" class="btn nav-btn">Xem Thư 💌</button>
+        <button id="btn-reset" class="btn nav-btn">Làm lại 🔄</button>
+    </div>
+
+    <!-- Thư tình Modal -->
+    <div id="modal">
+        <h2>💌 THƯ TÌNH DÀNH RIÊNG CHO MỸ 💌</h2>
+        <div id="letter-text"></div>
+        <button id="close-modal" class="btn nav-btn">Đóng thư 💕</button>
+    </div>
+</div>
+
+<script>
+    const TARGET_NAME = "Trương Gia Mỹ";
+    const letterContent = `Gửi chị ${TARGET_NAME},\n\nEm tạo chiếc app nhỏ này chỉ dành riêng cho chị thôi!\nCảm ơn chị vì đã luôn xuất hiện thật rạng rỡ và đem lại nhiều niềm vui.\nChúc chị luôn xinh đẹp, hạnh phúc và có những ngày thật ngọt ngào nha!\n\nFrom your secret admirer with 💖`;
+
+    const startScreen = document.getElementById('start-screen');
+    const btnYes = document.getElementById('btn-yes');
+    const btnNo = document.getElementById('btn-no');
+    const uiLayer = document.getElementById('ui-layer');
+    const btnLetter = document.getElementById('btn-letter');
+    const btnReset = document.getElementById('btn-reset');
+    const modal = document.getElementById('modal');
+    const letterText = document.getElementById('letter-text');
+    const closeModal = document.getElementById('close-modal');
+    const canvas = document.getElementById('canvas3d');
+    const ctx = canvas.getContext('2d');
+
+    let isMoving = false;
+    let dx = 5, dy = 4;
+    let yesX = -110, yesY = 60;
+    let animId = null;
+
+    // --- Nút né tránh ---
+    function moveYes() {
+        if (!isMoving) return;
+        yesX += dx;
+        yesY += dy;
+        if (yesX < -200 || yesX > 200) dx = -dx;
+        if (yesY < -150 || yesY > 200) dy = -dy;
+        btnYes.style.left = yesX + 'px';
+        btnYes.style.top = yesY + 'px';
+        requestAnimationFrame(moveYes);
+    }
+
+    btnNo.addEventListener('mouseenter', () => {
+        btnNo.style.display = 'none';
+        if (!isMoving) { isMoving = true; moveYes(); }
+    });
+
+    btnYes.addEventListener('click', () => {
+        if (!isMoving) {
+            isMoving = true;
+            moveYes();
+        } else {
+            start3D();
+        }
+    });
+
+    // --- 3D Heart Engine ---
+    let width, height, points = [], rotX = 0.2, rotY = 0;
+    const gradientColors = ["#200109", "#590d22", "#a4133d", "#c9184a", "#ff4d6d", "#ffccd5"];
+
+    function initPoints() {
+        points = [];
+        const count = window.innerWidth < 600 ? 1800 : 3500;
+        for (let i = 0; i < count; i++) {
+            let u = Math.random() * Math.PI * 2;
+            let v = (Math.random() - 0.5) * Math.PI;
+            let cosV = Math.pow(Math.abs(Math.cos(v)), 0.38);
+            let x = 16 * Math.pow(Math.sin(u), 3) * cosV;
+            let y = -(13 * Math.cos(u) - 5 * Math.cos(2*u) - 2 * Math.cos(3*u) - Math.cos(4*u)) * cosV;
+            let z = 6.8 * Math.sin(v);
+            
+            let scale = Math.random() < 0.4 ? Math.cbrt(Math.random()) : 1.0;
+            points.push({ x: x * 8 * scale, y: y * 8 * scale, z: z * 8 * scale, size: Math.random() > 0.8 ? 2 : 1 });
+        }
+    }
+
+    function resize() {
+        width = canvas.width = window.innerWidth;
+        height = canvas.height = window.innerHeight;
+    }
+
+    function render(frame) {
+        ctx.fillStyle = '#0a0307';
+        ctx.fillRect(0, 0, width, height);
+
+        rotY += 0.015;
+        rotX += 0.005;
+        let pulse = 1 + 0.08 * Math.sin(frame * 0.08);
+
+        let projected = [];
+        let fov = 450;
+
+        for (let p of points) {
+            let x = p.x * pulse;
+            let y = p.y * pulse;
+            let z = p.z * pulse;
+
+            // Rotate Y
+            let x1 = x * Math.cos(rotY) + z * Math.sin(rotY);
+            let z1 = -x * Math.sin(rotY) + z * Math.cos(rotY);
+            // Rotate X
+            let y2 = y * Math.cos(rotX) - z1 * Math.sin(rotX);
+            let z2 = y * Math.sin(rotX) + z1 * Math.cos(rotX);
+
+            let scale = fov / (z2 + fov + 200);
+            let sx = x1 * scale + width / 2;
+            let sy = y2 * scale + height / 2;
+
+            if (sx >= 0 && sx < width && sy >= 0 && sy < height) {
+                projected.push({ sx, sy, z: z2, sz: Math.max(1, p.size * scale) });
+            }
+        }
+
+        projected.sort((a, b) => a.z - b.z);
+
+        for (let p of projected) {
+            let colorIdx = Math.floor(((p.z + 150) / 300) * (gradientColors.length - 1));
+            colorIdx = Math.max(0, Math.min(gradientColors.length - 1, colorIdx));
+            ctx.fillStyle = gradientColors[colorIdx];
+            ctx.fillRect(p.sx, p.sy, p.sz, p.sz);
+        }
+
+        // Target Name
+        ctx.font = "bold 24px Arial";
+        ctx.textAlign = "center";
+        ctx.fillStyle = "#fff0f3";
+        ctx.fillText(TARGET_NAME, width / 2, height / 2);
+
+        animId = requestAnimationFrame(() => render(frame + 1));
+    }
+
+    function start3D() {
+        startScreen.style.display = 'none';
+        uiLayer.style.display = 'flex';
+        resize();
+        initPoints();
+        window.addEventListener('resize', resize);
+        render(0);
+    }
+
+    // --- Letter Typewriter ---
+    btnLetter.addEventListener('click', () => {
+        modal.style.display = 'block';
+        letterText.innerText = '';
+        let i = 0;
+        function type() {
+            if (i < letterContent.length) {
+                letterText.innerText += letterContent.charAt(i);
+                i++;
+                setTimeout(type, 30);
+            }
+        }
+        type();
+    });
+
+    closeModal.addEventListener('click', () => modal.style.display = 'none');
+
+    btnReset.addEventListener('click', () => {
+        cancelAnimationFrame(animId);
+        modal.style.display = 'none';
+        uiLayer.style.display = 'none';
+        startScreen.style.display = 'block';
+        btnNo.style.display = 'inline-block';
+        isMoving = false;
+        yesX = -110; yesY = 60;
+        btnYes.style.left = yesX + 'px';
+        btnYes.style.top = yesY + 'px';
+    });
+</script>
+</body>
+</html>
