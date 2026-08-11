@@ -79,17 +79,6 @@
             cursor: grabbing;
         }
 
-        #equalizerCanvas {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 120px;
-            z-index: 4;
-            pointer-events: none;
-            opacity: 0.7;
-        }
-
         /* ==========================================
            4. INTRO SCREEN & QUESTION BOX
            ========================================== */
@@ -198,7 +187,7 @@
             right: 24px;
             z-index: 50;
             display: none;
-            gap: 12px;
+            gap: 10px;
             flex-wrap: wrap;
             justify-content: flex-end;
         }
@@ -206,8 +195,8 @@
         .hud-button {
             display: inline-flex;
             align-items: center;
-            gap: 8px;
-            padding: 10px 20px;
+            gap: 6px;
+            padding: 10px 18px;
             font-size: 0.88rem;
             font-weight: 500;
             color: var(--accent-light);
@@ -225,6 +214,24 @@
             color: #ffffff;
             box-shadow: 0 0 20px var(--accent-pink);
             transform: translateY(-2px);
+        }
+
+        /* Song Info Pill */
+        #song-pill {
+            position: absolute;
+            bottom: 24px;
+            left: 24px;
+            z-index: 50;
+            display: none;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 16px;
+            background: rgba(15, 4, 11, 0.85);
+            border: 1px solid var(--glass-border);
+            backdrop-filter: blur(8px);
+            border-radius: 20px;
+            font-size: 0.82rem;
+            color: var(--accent-light);
         }
 
         /* ==========================================
@@ -266,7 +273,6 @@
             gap: 10px;
         }
 
-        /* Settings Tabs Navigation */
         .tab-nav {
             display: flex;
             gap: 8px;
@@ -302,7 +308,6 @@
             display: block;
         }
 
-        /* Form Controls */
         .control-group {
             margin-bottom: 18px;
         }
@@ -355,8 +360,18 @@
             outline: none;
         }
 
-        /* Letter Body */
-        #letter-text-container {
+        .music-btn-row {
+            display: flex;
+            gap: 10px;
+            margin-top: 12px;
+        }
+
+        .music-btn-row .hud-button {
+            flex: 1;
+            justify-content: center;
+        }
+
+        .letter-text-box {
             font-size: 0.96rem;
             line-height: 1.7;
             color: var(--text-main);
@@ -369,11 +384,11 @@
             border: 1px dashed rgba(255, 120, 150, 0.3);
         }
 
-        #letter-text-container::-webkit-scrollbar {
+        .letter-text-box::-webkit-scrollbar {
             width: 6px;
         }
 
-        #letter-text-container::-webkit-scrollbar-thumb {
+        .letter-text-box::-webkit-scrollbar-thumb {
             background: var(--accent-deep);
             border-radius: 3px;
         }
@@ -428,7 +443,6 @@
     <canvas id="bgCanvas" class="canvas-layer"></canvas>
     <canvas id="trailCanvas" class="canvas-layer"></canvas>
     <canvas id="heartCanvas" class="canvas-layer"></canvas>
-    <canvas id="equalizerCanvas"></canvas>
 
     <!-- Màn hình 1: Câu Hỏi Tương Tác -->
     <div id="intro-screen">
@@ -445,11 +459,19 @@
 
     <!-- HUD Điều Khiển Màn Hình Chính -->
     <div id="hud-navbar">
-        <button id="btn-settings" class="hud-button"><span>⚙️</span> Cài Đặt</button>
+        <button id="btn-prev-track" class="hud-button" title="Bài trước"><span>⏮️</span></button>
+        <button id="btn-next-track" class="hud-button" title="Bài tiếp"><span>⏭️</span></button>
         <button id="btn-music" class="hud-button"><span>🎵</span> Tắt Nhạc</button>
+        <button id="btn-settings" class="hud-button"><span>⚙️</span> Cài Đặt</button>
         <button id="btn-letter" class="hud-button"><span>💌</span> Xem Thư</button>
+        <button id="btn-apology" class="hud-button"><span>🥺</span> Thư Xin Lỗi</button>
         <button id="btn-preset" class="hud-button"><span>🎨</span> Đổi Màu</button>
         <button id="btn-reset" class="hud-button"><span>🔄</span> Làm Lại</button>
+    </div>
+
+    <!-- Song Info Display -->
+    <div id="song-pill">
+        <span>🎶</span> <span id="current-song-name">Sweet Love</span>
     </div>
 
     <!-- Toast Popup System -->
@@ -458,18 +480,25 @@
     <!-- Modal 1: Cửa Sổ Thư Tình -->
     <div id="modal-letter" class="modal-wrapper">
         <h2 class="modal-title"><span>💌</span> BỨC THƯ TÌNH CỦA MỸ</h2>
-        <div id="letter-text-container"></div>
+        <div id="letter-text-container" class="letter-text-box"></div>
         <button id="close-letter" class="hud-button btn-modal-close">Đóng Thư 💕</button>
     </div>
 
-    <!-- Modal 2: Cửa Sổ Cài Đặt Nâng Cao (Tabbed Interface) -->
+    <!-- Modal 1b: Cửa Sổ Thư Xin Lỗi Chân Thành -->
+    <div id="modal-apology" class="modal-wrapper">
+        <h2 class="modal-title"><span>🥺</span> LỜI XIN LỖI CHÂN THÀNH</h2>
+        <div id="apology-text-container" class="letter-text-box"></div>
+        <button id="close-apology" class="hud-button btn-modal-close">Tha Lỗi Cho Em Nha 💕</button>
+    </div>
+
+    <!-- Modal 2: Cửa Sổ Cài Đặt Nâng Cao -->
     <div id="modal-settings" class="modal-wrapper">
         <h2 class="modal-title"><span>⚙️</span> CÀI ĐẶT TRÁI TIM 3D</h2>
         
         <div class="tab-nav">
             <button class="tab-btn active" data-tab="tab-3d">Hình Khối 3D</button>
             <button class="tab-btn" data-tab="tab-fx">Hiệu Ứng</button>
-            <button class="tab-btn" data-tab="tab-audio">Âm Nhạc</button>
+            <button class="tab-btn" data-tab="tab-audio">Danh Sách Nhạc</button>
         </div>
 
         <!-- Tab 1: 3D Engine Control -->
@@ -528,17 +557,21 @@
             </div>
         </div>
 
-        <!-- Tab 3: Audio & Beats -->
+        <!-- Tab 3: Playlist & Audio Controls -->
         <div id="tab-audio" class="tab-content">
             <div class="control-group">
                 <div class="control-label">
-                    <span>Đập theo nhịp nhạc (Beat React):</span>
-                    <span id="lbl-beat" class="val-tag">Bật</span>
+                    <span>Chọn bài hát:</span>
                 </div>
-                <input type="range" id="slider-beat" min="0" max="1" step="1" value="1">
+                <select id="select-song" class="select-custom"></select>
+                
+                <div class="music-btn-row">
+                    <button id="modal-btn-prev" class="hud-button"><span>⏮️</span> Bài Trước</button>
+                    <button id="modal-btn-next" class="hud-button"><span>⏭️</span> Bài Tiếp</button>
+                </div>
             </div>
 
-            <div class="control-group" style="margin-top: 15px;">
+            <div class="control-group" style="margin-top: 18px;">
                 <div class="control-label">
                     <span>Âm lượng nhạc nền:</span>
                     <span id="lbl-vol" class="val-tag">80%</span>
@@ -550,16 +583,29 @@
         <button id="close-settings" class="hud-button btn-modal-close">Lưu & Đóng ✨</button>
     </div>
 
-    <!-- Background Music Element -->
-    <audio id="bgm" loop src="https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=sweet-love-111578.mp3"></audio>
+    <!-- Background Audio Element -->
+    <audio id="bgm"></audio>
 
 <script>
     /* ==========================================================================
-       8. GLOBAL STATE & CONFIGURATION MATRIX
+       8. PLAYLIST & CONFIGURATION MATRIX
        ========================================================================== */
     const TARGET_NAME = "Trương Gia Mỹ";
     
-    const letterTextContent = `Gửi chị ${TARGET_NAME},\n\nEm tạo chiếc app nhỏ này chỉ dành riêng cho chị thôi!\nCảm ơn chị vì đã luôn xuất hiện thật rạng rỡ và đem lại nhiều niềm vui cho em.\n\nChúc chị luôn xinh đẹp, hạnh phúc, đạt được mọi ước mơ và có những ngày tháng thật ngọt ngào nha!\n\nFrom your secret admirer with 💖`;
+    // Danh sách các bài nhạc lãng mạn
+    const playlist = [
+        { name: "Sweet Love 💕", url: "https://cdn.pixabay.com/download/audio/2022/05/27/audio_1808fbf07a.mp3?filename=sweet-love-111578.mp3" },
+        { name: "Romantic Piano Melody 🎹", url: "https://cdn.pixabay.com/download/audio/2022/03/15/audio_c8c8a8117d.mp3?filename=romantic-piano-10881.mp3" },
+        { name: "Sweet Passion 💖", url: "https://cdn.pixabay.com/download/audio/2022/01/18/audio_d0a13f69d2.mp3?filename=sweet-romantic-melody-15336.mp3" },
+        { name: "Gentle Piano Love 🌹", url: "https://cdn.pixabay.com/download/audio/2022/10/14/audio_9939a04a39.mp3?filename=gentle-piano-love-12345.mp3" },
+        { name: "Soft Romance Dreams ✨", url: "https://cdn.pixabay.com/download/audio/2021/08/09/audio_a405315511.mp3?filename=soft-piano-10084.mp3" }
+    ];
+
+    let currentTrackIndex = 0;
+
+    const letterTextContent = `Gửi chị ${TARGET_NAME},\n\nEm tạo chiếc app nhỏ này chỉ dành riêng cho chị thôi!\nCảm ơn chị vì đã luôn xuất hiện thật rạng rỡ và đem lại nhiều niềm vui cho mọi người xung quanh.\n\nChúc chị luôn xinh đẹp, hạnh phúc, đạt được mọi ước mơ và có những ngày tháng thật ngọt ngào nha!\n\nFrom your secret admirer with 💖`;
+
+    const apologyTextContent = `Gửi chị ${TARGET_NAME},\n\nEm viết những dòng này từ sự chân thành và sâu thẳm nhất trong lòng em. Có lẽ đôi lúc em đã vô ý làm chị phiền lòng, có những lời nói hay hành động chưa đủ tinh tế khiến chị phải buồn hay suy nghĩ...\n\nEm biết một lời xin lỗi suông thì không thể bù đắp hết được, nhưng chiếc app nhỏ cùng cả trái tim 3D này là toàn bộ sự trân trọng và cầu thị em dành cho chị. Mỗi ngày trôi qua em luôn mong chị Mỹ được rạng rỡ và hạnh phúc nhất.\n\nNếu em từng có lỗi gì, mong chị rộng lượng tha lỗi cho em nha. Em hứa sẽ lắng nghe, thay đổi và quan tâm chị chu đáo hơn mỗi ngày.\n\nChỉ mong nụ cười luôn nở trên môi chị, vì nụ cười của chị Mỹ đẹp và ấm áp lắm! 🥺💖`;
 
     const teaseMessages = [
         "Ơ chị định bấm 'Không' thiệt hả? 🥺",
@@ -570,25 +616,22 @@
         "Thôi bấm 'Đồng ý' bên kia cho lẹ nè chị ơi! 🎉"
     ];
 
-    // Main App Config
     let config = {
         scaleMultiplier: 1.0,
         rotSpeedMultiplier: 1.0,
         pulseSpeedMultiplier: 1.0,
         particleCount: 4500,
         trailEnabled: true,
-        beatReactEnabled: true,
         bgMode: 'stars',
         themeIndex: 0,
         volume: 0.8
     };
 
-    // Color Palettes Matrix
     const colorThemes = [
-        ["#200109", "#590d22", "#800f2f", "#a4133d", "#c9184a", "#ff4d6d", "#ff88a5", "#ffffff"], // Classic Crimson
-        ["#03045e", "#0077b6", "#00b4d8", "#90e0ef", "#caf0f8", "#4cc9f0", "#7209b7", "#ffffff"], // Cyber Neon
-        ["#2d00f7", "#6b00f7", "#a100f7", "#d800f7", "#f700n7", "#ff007f", "#ff88a5", "#ffffff"], // Violet Passion
-        ["#38b000", "#70e000", "#9ef01a", "#ccff33", "#ffff33", "#ff9100", "#ff5400", "#ffffff"]  // Gold Emerald
+        ["#200109", "#590d22", "#800f2f", "#a4133d", "#c9184a", "#ff4d6d", "#ff88a5", "#ffffff"],
+        ["#03045e", "#0077b6", "#00b4d8", "#90e0ef", "#caf0f8", "#4cc9f0", "#7209b7", "#ffffff"],
+        ["#2d00f7", "#6b00f7", "#a100f7", "#d800f7", "#f700n7", "#ff007f", "#ff88a5", "#ffffff"],
+        ["#38b000", "#70e000", "#9ef01a", "#ccff33", "#ffff33", "#ff9100", "#ff5400", "#ffffff"]
     ];
 
     let currentGradient = colorThemes[0];
@@ -602,28 +645,40 @@
     const btnYes = document.getElementById('btn-yes');
     const btnNo = document.getElementById('btn-no');
     const hudNavbar = document.getElementById('hud-navbar');
+    const songPill = document.getElementById('song-pill');
+    const currentSongName = document.getElementById('current-song-name');
     const toastContainer = document.getElementById('toast-container');
 
     const btnSettings = document.getElementById('btn-settings');
     const btnMusic = document.getElementById('btn-music');
+    const btnPrevTrack = document.getElementById('btn-prev-track');
+    const btnNextTrack = document.getElementById('btn-next-track');
     const btnLetter = document.getElementById('btn-letter');
+    const btnApology = document.getElementById('btn-apology');
     const btnPreset = document.getElementById('btn-preset');
     const btnReset = document.getElementById('btn-reset');
 
     const modalLetter = document.getElementById('modal-letter');
+    const modalApology = document.getElementById('modal-apology');
     const modalSettings = document.getElementById('modal-settings');
+    
     const letterTextContainer = document.getElementById('letter-text-container');
+    const apologyTextContainer = document.getElementById('apology-text-container');
+    
     const closeLetter = document.getElementById('close-letter');
+    const closeApology = document.getElementById('close-apology');
     const closeSettings = document.getElementById('close-settings');
     const bgm = document.getElementById('bgm');
 
-    // Controls DOM
+    // Music & Settings DOM
+    const selectSong = document.getElementById('select-song');
+    const modalBtnPrev = document.getElementById('modal-btn-prev');
+    const modalBtnNext = document.getElementById('modal-btn-next');
     const sliderScale = document.getElementById('slider-scale');
     const sliderRot = document.getElementById('slider-rot');
     const sliderPulse = document.getElementById('slider-pulse');
     const sliderDensity = document.getElementById('slider-density');
     const sliderTrail = document.getElementById('slider-trail');
-    const sliderBeat = document.getElementById('slider-beat');
     const sliderVol = document.getElementById('slider-vol');
     const selectBgMode = document.getElementById('select-bg-mode');
 
@@ -632,14 +687,13 @@
     const lblPulse = document.getElementById('lbl-pulse');
     const lblDensity = document.getElementById('lbl-density');
     const lblTrail = document.getElementById('lbl-trail');
-    const lblBeat = document.getElementById('lbl-beat');
     const lblVol = document.getElementById('lbl-vol');
 
     let yesBtnScale = 1.0;
     let teaseIndex = 0;
 
     /* ==========================================================================
-       10. UTILITY & TOAST SYSTEM
+       10. UTILITY & MUSIC PLAYER ENGINE
        ========================================================================== */
     function showToast(message) {
         const toast = document.createElement('div');
@@ -649,8 +703,52 @@
         setTimeout(() => toast.remove(), 3000);
     }
 
+    function initPlaylistUI() {
+        selectSong.innerHTML = '';
+        playlist.forEach((song, idx) => {
+            const opt = document.createElement('option');
+            opt.value = idx;
+            opt.innerText = `${idx + 1}. ${song.name}`;
+            selectSong.appendChild(opt);
+        });
+    }
+
+    function loadTrack(index, autoPlay = true) {
+        if (index < 0) index = playlist.length - 1;
+        if (index >= playlist.length) index = 0;
+        
+        currentTrackIndex = index;
+        bgm.src = playlist[currentTrackIndex].url;
+        bgm.volume = config.volume;
+        
+        currentSongName.innerText = playlist[currentTrackIndex].name;
+        selectSong.value = currentTrackIndex;
+
+        if (autoPlay) {
+            bgm.play().then(() => {
+                btnMusic.querySelector('span').innerText = "🎵";
+                btnMusic.childNodes[1].nodeValue = " Tắt Nhạc";
+            }).catch(() => {});
+        }
+    }
+
+    function nextTrack() {
+        loadTrack(currentTrackIndex + 1);
+        showToast(`Đang phát: ${playlist[currentTrackIndex].name}`);
+    }
+
+    function prevTrack() {
+        loadTrack(currentTrackIndex - 1);
+        showToast(`Đang phát: ${playlist[currentTrackIndex].name}`);
+    }
+
+    // Auto play next song when current track finishes
+    bgm.addEventListener('ended', () => {
+        nextTrack();
+    });
+
     /* ==========================================================================
-       11. INTRO SCREEN DODGING BUTTON ALGORITHM
+       11. INTRO SCREEN DODGING BUTTON
        ========================================================================== */
     function moveNoButton() {
         const cardRect = questionCard.getBoundingClientRect();
@@ -665,11 +763,9 @@
         btnNo.style.left = `${newX}px`;
         btnNo.style.top = `${newY}px`;
 
-        // Teaser text rotation
         teaserText.innerText = teaseMessages[teaseIndex % teaseMessages.length];
         teaseIndex++;
 
-        // Grow "YES" button exponentially
         yesBtnScale += 0.12;
         if (yesBtnScale < 2.5) {
             btnYes.style.transform = `scale(${yesBtnScale})`;
@@ -687,18 +783,15 @@
         setTimeout(() => {
             introScreen.style.visibility = 'hidden';
             hudNavbar.style.display = 'flex';
+            songPill.style.display = 'flex';
             showToast("Chào mừng chị Trương Gia Mỹ! 💕");
         }, 800);
 
-        bgm.volume = config.volume;
-        bgm.play().catch(() => {
-            btnMusic.querySelector('span').innerText = "🎵";
-            btnMusic.childNodes[1].nodeValue = " Bật Nhạc";
-        });
+        loadTrack(0, true);
     });
 
     /* ==========================================================================
-       12. AMBIENT BACKGROUND & MOUSE TRAIL CANVAS ENGINES
+       12. AMBIENT BACKGROUND & MOUSE TRAIL
        ========================================================================== */
     const bgCanvas = document.getElementById('bgCanvas');
     const bgCtx = bgCanvas.getContext('2d');
@@ -732,7 +825,6 @@
 
     function renderBg() {
         bgCtx.clearRect(0, 0, bgCanvas.width, bgCanvas.height);
-        
         for (let p of bgParticles) {
             p.y += p.speedY;
             p.x += p.speedX;
@@ -750,7 +842,6 @@
         requestAnimationFrame(renderBg);
     }
 
-    // Mouse Glitter Trail Engine
     window.addEventListener('mousemove', (e) => {
         if (!config.trailEnabled) return;
         for (let i = 0; i < 2; i++) {
@@ -789,7 +880,7 @@
     }
 
     /* ==========================================================================
-       13. 3D HEART RENDERING & MATH ENGINE
+       13. 3D HEART RENDERING ENGINE
        ========================================================================== */
     const canvas = document.getElementById('heartCanvas');
     const ctx = canvas.getContext('2d');
@@ -808,7 +899,6 @@
             let u = Math.random() * Math.PI * 2;
             let v = (Math.random() - 0.5) * Math.PI;
             
-            // Parametric 3D Heart Equation
             let cosV = Math.pow(Math.abs(Math.cos(v)), 0.35);
             let x = 16 * Math.pow(Math.sin(u), 3) * cosV;
             let y = -(13 * Math.cos(u) - 5 * Math.cos(2*u) - 2 * Math.cos(3*u) - Math.cos(4*u)) * cosV;
@@ -829,7 +919,6 @@
         canvas.height = window.innerHeight;
     }
 
-    // Touch & Mouse Drag Handlers
     window.addEventListener('mousedown', (e) => {
         isDragging = true;
         lastMouseX = e.clientX;
@@ -889,7 +978,6 @@
             let y = p.y * pulse * config.scaleMultiplier;
             let z = p.z * pulse * config.scaleMultiplier;
 
-            // Matrix Rotation Calculations
             let x1 = x * Math.cos(rotY) + z * Math.sin(rotY);
             let z1 = -x * Math.sin(rotY) + z * Math.cos(rotY);
 
@@ -910,10 +998,8 @@
             }
         }
 
-        // Z-Index Sorting
         projected.sort((a, b) => a.z - b.z);
 
-        // Render Particles
         for (let p of projected) {
             let colorIdx = Math.floor(((p.z + 160) / 320) * (currentGradient.length - 1));
             colorIdx = Math.max(0, Math.min(currentGradient.length - 1, colorIdx));
@@ -922,7 +1008,6 @@
             ctx.fillRect(p.sx, p.sy, p.sz, p.sz);
         }
 
-        // Render Name in 3D Center
         ctx.font = "bold 26px -apple-system, sans-serif";
         ctx.textAlign = "center";
         ctx.textBaseline = "middle";
@@ -936,7 +1021,7 @@
     }
 
     /* ==========================================================================
-       14. TYPEWRITER LETTER ENGINE
+       14. TYPEWRITER LETTER ENGINE & APOLOGY ENGINE
        ========================================================================== */
     btnLetter.addEventListener('click', () => {
         modalLetter.style.display = 'block';
@@ -955,13 +1040,30 @@
 
     closeLetter.addEventListener('click', () => modalLetter.style.display = 'none');
 
+    // Apology letter logic
+    btnApology.addEventListener('click', () => {
+        modalApology.style.display = 'block';
+        apologyTextContainer.innerText = '';
+        let index = 0;
+
+        function typeApology() {
+            if (index < apologyTextContent.length) {
+                apologyTextContainer.innerText += apologyTextContent.charAt(index);
+                index++;
+                setTimeout(typeApology, 30);
+            }
+        }
+        typeApology();
+    });
+
+    closeApology.addEventListener('click', () => modalApology.style.display = 'none');
+
     /* ==========================================================================
-       15. TABBED SETTINGS CONTROLLERS
+       15. TABBED SETTINGS & MUSIC LISTENERS
        ========================================================================== */
     btnSettings.addEventListener('click', () => modalSettings.style.display = 'block');
     closeSettings.addEventListener('click', () => modalSettings.style.display = 'none');
 
-    // Tab Navigation Switcher
     document.querySelectorAll('.tab-btn').forEach(btn => {
         btn.addEventListener('click', () => {
             document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
@@ -971,7 +1073,18 @@
         });
     });
 
-    // Slider Listeners
+    // Music control listeners
+    btnPrevTrack.addEventListener('click', prevTrack);
+    btnNextTrack.addEventListener('click', nextTrack);
+    modalBtnPrev.addEventListener('click', prevTrack);
+    modalBtnNext.addEventListener('click', nextTrack);
+
+    selectSong.addEventListener('change', (e) => {
+        loadTrack(parseInt(e.target.value));
+        showToast(`Đã chọn: ${playlist[currentTrackIndex].name}`);
+    });
+
+    // Sliders
     sliderScale.addEventListener('input', (e) => {
         config.scaleMultiplier = parseFloat(e.target.value);
         lblScale.innerText = `${config.scaleMultiplier.toFixed(2)}x`;
@@ -998,11 +1111,6 @@
         lblTrail.innerText = config.trailEnabled ? "Bật" : "Tắt";
     });
 
-    sliderBeat.addEventListener('input', (e) => {
-        config.beatReactEnabled = parseInt(e.target.value) === 1;
-        lblBeat.innerText = config.beatReactEnabled ? "Bật" : "Tắt";
-    });
-
     sliderVol.addEventListener('input', (e) => {
         config.volume = parseFloat(e.target.value);
         bgm.volume = config.volume;
@@ -1014,14 +1122,12 @@
         initBgParticles();
     });
 
-    // Theme Palette Switcher
     btnPreset.addEventListener('click', () => {
         config.themeIndex = (config.themeIndex + 1) % colorThemes.length;
         currentGradient = colorThemes[config.themeIndex];
         showToast(`Đã đổi bảng màu ${config.themeIndex + 1} 🎨`);
     });
 
-    // Toggle Audio
     btnMusic.addEventListener('click', () => {
         if (bgm.paused) {
             bgm.play();
@@ -1034,11 +1140,12 @@
         }
     });
 
-    // Reset Experience
     btnReset.addEventListener('click', () => {
         modalLetter.style.display = 'none';
+        modalApology.style.display = 'none';
         modalSettings.style.display = 'none';
         hudNavbar.style.display = 'none';
+        songPill.style.display = 'none';
         introScreen.style.visibility = 'visible';
         introScreen.style.opacity = '1';
         btnNo.style.left = '56%';
@@ -1047,6 +1154,7 @@
         btnYes.style.transform = 'scale(1)';
         teaserText.innerText = 'Hãy chọn câu trả lời thật lòng nha... ✨';
         teaseIndex = 0;
+        bgm.pause();
         showToast("Đã khởi động lại màn hình!");
     });
 
@@ -1061,6 +1169,7 @@
     });
 
     // Execution Flow Start
+    initPlaylistUI();
     resizeBackgroundCanvases();
     resizeHeartCanvas();
     initBgParticles();
@@ -1071,3 +1180,5 @@
 </script>
 </body>
 </html>
+
+
