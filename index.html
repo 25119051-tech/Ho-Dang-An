@@ -464,6 +464,7 @@
         <button id="btn-music" class="hud-button"><span>🎵</span> Tắt Nhạc</button>
         <button id="btn-settings" class="hud-button"><span>⚙️</span> Cài Đặt</button>
         <button id="btn-letter" class="hud-button"><span>💌</span> Xem Thư</button>
+        <button id="btn-thanks" class="hud-button"><span>💐</span> Thư Cảm Ơn</button>
         <button id="btn-apology" class="hud-button"><span>🥺</span> Thư Xin Lỗi</button>
         <button id="btn-preset" class="hud-button"><span>🎨</span> Đổi Màu</button>
         <button id="btn-reset" class="hud-button"><span>🔄</span> Làm Lại</button>
@@ -484,7 +485,14 @@
         <button id="close-letter" class="hud-button btn-modal-close">Đóng Thư 💕</button>
     </div>
 
-    <!-- Modal 1b: Cửa Sổ Thư Xin Lỗi Chân Thành -->
+    <!-- Modal 1b: Cửa Sổ Thư Cảm Ơn -->
+    <div id="modal-thanks" class="modal-wrapper">
+        <h2 class="modal-title"><span>💐</span> LỜI CẢM ƠN CHÂN THÀNH</h2>
+        <div id="thanks-text-container" class="letter-text-box"></div>
+        <button id="close-thanks" class="hud-button btn-modal-close">Cảm Ơn Chị Mỹ 💕</button>
+    </div>
+
+    <!-- Modal 1c: Cửa Sổ Thư Xin Lỗi Chân Thành -->
     <div id="modal-apology" class="modal-wrapper">
         <h2 class="modal-title"><span>🥺</span> LỜI XIN LỖI CHÂN THÀNH</h2>
         <div id="apology-text-container" class="letter-text-box"></div>
@@ -505,7 +513,7 @@
         <div id="tab-3d" class="tab-content active">
             <div class="control-group">
                 <div class="control-label">
-                    <span>Cỡ trái tim:</span>
+                    <span>C cỡ trái tim:</span>
                     <span id="lbl-scale" class="val-tag">1.0x</span>
                 </div>
                 <input type="range" id="slider-scale" min="0.4" max="2.4" step="0.05" value="1.0">
@@ -605,6 +613,8 @@
 
     const letterTextContent = `Gửi chị ${TARGET_NAME},\n\nEm tạo chiếc app nhỏ này chỉ dành riêng cho chị thôi!\nCảm ơn chị vì đã luôn xuất hiện thật rạng rỡ và đem lại nhiều niềm vui cho mọi người xung quanh.\n\nChúc chị luôn xinh đẹp, hạnh phúc, đạt được mọi ước mơ và có những ngày tháng thật ngọt ngào nha!\n\nFrom your secret admirer with 💖`;
 
+    const thanksTextContent = `Gửi chị ${TARGET_NAME},\n\n 7/10/2026 \n\nSau ngày hôm nay em biết chúng ta sẽ khó nói chuyện lại với nhau, em không biết sao nữa em không muốn như này tí nào.\n\nTrương Gia Mỹ,Hồ Đăng An ghéc chịiiiiii.\n\nNói chớ em biết chị chán em rồi, không muốn làm phiền chị, ai cũng có cuộc sống riêng cả, nào có bồ thì đăng ẩn ý lên để em biết em hết hi vọng \n\nFrom Hàn Đăng Ô`;
+
     const apologyTextContent = `Gửi chị ${TARGET_NAME},\n\nEm viết những dòng này từ sự chân thành và sâu thẳm nhất trong lòng em. Có lẽ đôi lúc em đã vô ý làm chị phiền lòng, có những lời nói hay hành động chưa đủ tinh tế khiến chị phải buồn hay suy nghĩ...\n\nEm biết một lời xin lỗi suông thì không thể bù đắp hết được, nhưng chiếc app nhỏ cùng cả trái tim 3D này là toàn bộ sự trân trọng và cầu thị em dành cho chị. Mỗi ngày trôi qua em luôn mong chị Mỹ được rạng rỡ và hạnh phúc nhất.\n\nNếu em từng có lỗi gì, mong chị rộng lượng tha lỗi cho em nha. Em hứa sẽ lắng nghe, thay đổi và quan tâm chị chu đáo hơn mỗi ngày.\n\nChỉ mong nụ cười luôn nở trên môi chị, vì nụ cười của chị Mỹ đẹp và ấm áp lắm! 🥺💖`;
 
     const teaseMessages = [
@@ -654,18 +664,22 @@
     const btnPrevTrack = document.getElementById('btn-prev-track');
     const btnNextTrack = document.getElementById('btn-next-track');
     const btnLetter = document.getElementById('btn-letter');
+    const btnThanks = document.getElementById('btn-thanks');
     const btnApology = document.getElementById('btn-apology');
     const btnPreset = document.getElementById('btn-preset');
     const btnReset = document.getElementById('btn-reset');
 
     const modalLetter = document.getElementById('modal-letter');
+    const modalThanks = document.getElementById('modal-thanks');
     const modalApology = document.getElementById('modal-apology');
     const modalSettings = document.getElementById('modal-settings');
     
     const letterTextContainer = document.getElementById('letter-text-container');
+    const thanksTextContainer = document.getElementById('thanks-text-container');
     const apologyTextContainer = document.getElementById('apology-text-container');
     
     const closeLetter = document.getElementById('close-letter');
+    const closeThanks = document.getElementById('close-thanks');
     const closeApology = document.getElementById('close-apology');
     const closeSettings = document.getElementById('close-settings');
     const bgm = document.getElementById('bgm');
@@ -1021,8 +1035,9 @@
     }
 
     /* ==========================================================================
-       14. TYPEWRITER LETTER ENGINE & APOLOGY ENGINE
+       14. TYPEWRITER LETTER, THANKS & APOLOGY ENGINE
        ========================================================================== */
+    // Thư Tình
     btnLetter.addEventListener('click', () => {
         modalLetter.style.display = 'block';
         letterTextContainer.innerText = '';
@@ -1040,7 +1055,25 @@
 
     closeLetter.addEventListener('click', () => modalLetter.style.display = 'none');
 
-    // Apology letter logic
+    // Thư Cảm Ơn
+    btnThanks.addEventListener('click', () => {
+        modalThanks.style.display = 'block';
+        thanksTextContainer.innerText = '';
+        let index = 0;
+
+        function typeThanks() {
+            if (index < thanksTextContent.length) {
+                thanksTextContainer.innerText += thanksTextContent.charAt(index);
+                index++;
+                setTimeout(typeThanks, 30);
+            }
+        }
+        typeThanks();
+    });
+
+    closeThanks.addEventListener('click', () => modalThanks.style.display = 'none');
+
+    // Thư Xin Lỗi
     btnApology.addEventListener('click', () => {
         modalApology.style.display = 'block';
         apologyTextContainer.innerText = '';
@@ -1142,6 +1175,7 @@
 
     btnReset.addEventListener('click', () => {
         modalLetter.style.display = 'none';
+        modalThanks.style.display = 'none';
         modalApology.style.display = 'none';
         modalSettings.style.display = 'none';
         hudNavbar.style.display = 'none';
@@ -1180,5 +1214,3 @@
 </script>
 </body>
 </html>
-
-
